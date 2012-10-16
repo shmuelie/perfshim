@@ -1,4 +1,8 @@
-﻿window.perfshim("addEventListener", function ()
+﻿/*
+    addEventListener Shim
+    Allows the use of addEventListener in browsers that do not implement it.
+*/
+window.perfshim("addEventListener", function ()
 {
     if (typeof window.addEventListener !== "function")
     {
@@ -27,7 +31,7 @@
             }
 
             var fns = [fListener];
-            // if there is already a event function and it's not "ours" then add it to the collection too.
+            // If there is already a event function and it's not "ours" then add it to the collection too.
             if (isFunction && (this[onName].functions === undefined))
             {
                 fns.push(this[onName]);
@@ -74,9 +78,9 @@
 
 
             var onName = "on" + sEventType;
-            // search for the function
+            // Search for the function
             var itemIndex = this[onName].functions.indexOf(fListener);
-            // if found remove.
+            // If found remove.
             if (itemIndex != -1)
             {
                 this[onName].functions.splice(itemIndex, 1);

@@ -1,9 +1,29 @@
-﻿window.perfshim("extendDOM", function ()
+﻿/*
+    extendDOM Shim
+    Allows for DOM super type elements to be extended even in browsers that do 
+    not support it.
+
+    Because of the fact that even in browsers that allow DOM super types to be
+    edited differ in how to do it, the shim always wraps the logic. The 
+    difference is in that to the user the differences are abstracted and if
+    need the ability is added.
+*/
+window.perfshim("extendDOM", function ()
 {
     var addedFunctions = {};
 
+    // If the Element and the HTMLElement objects do not exist then the real Shim is really needed
     if (!window.Element && !window.HTMLElement)
     {
+        /*
+            The shim works by replacing calls to document.createElement, 
+            document.getElementById, document.getElementsByTagName, and
+            document.getElementsByName with custom methods. The custom methods
+            call the original method and then adds the consume items to the
+            returned object(s).
+        */
+
+        // Store the original functions so we can call them in the custom one.
         var origCreateElement = document.createElement;
         var origGetElementById = document.getElementById;
         var origGetElementsByTagName = document.getElementsByTagName;
