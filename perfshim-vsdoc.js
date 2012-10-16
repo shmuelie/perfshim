@@ -86,6 +86,20 @@
 			},
 			dependencies: ["extendDOM"]
 		},
+		createElement:
+		{
+			name: "createElement",
+			url: "createElement-vsdoc.js",
+			environmentNeeds: function ()
+			{
+				return (document.createElement.length == 1);
+			},
+			scriptNeeds: function (script)
+			{
+				return true;
+			},
+			dependencies: []
+		},
 		extendDOM:
 		{
 			name: "extendDOM",
