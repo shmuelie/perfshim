@@ -24,5 +24,9 @@ Examples:
 	perfshim("Script1.js", "Script2.js", ScriptN.js");
 
 ### History
+Verions 0.6
+* lots of bug fixes
+* new shim for createElement
+* added test case for addEventListener
 Version 0.5
 * First public release, includes shim for addEventListener and its dependency extendDOM.
