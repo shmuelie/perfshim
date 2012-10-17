@@ -13,8 +13,8 @@ your page. You do not include any of the scripts from your site that you want
 to use on the page (currently PerfShim only works with scripts from the same 
 origin as the page so third-party scripts cannot be used with it). In an inline 
 script on the page you call the perfshim function. The first argument can be a 
-function that is on the page to be called once all shims are loaded, your 
-scripts are loaded, and the DOM is ready. (If you don't care about being 
+function that is on the page to be called once all shims are loaded and your 
+scripts are loaded. (If you don't care about being 
 alerted to this state then the first argument should be used like the rest.) 
 The rest of the arguments are strings (can be relative or absolute) that point 
 at your scripts you would like to use on the page.

@@ -5,7 +5,7 @@
 */
 window.perfshim("createElement", function ()
 {
-    if (document.createElement.length == 1)
+    if (document.createElement.length === 1)
     {
         var origCreateElement = document.createElement;
 
