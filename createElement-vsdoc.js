@@ -2,6 +2,8 @@
     createElement Shim
     Extends document.createElement to accept and optional second argument that allows for properties to be set on creation.
     Based on jQuery ability jQuery("<div>",{id:'foo'})[0]
+    NOTE: must be loaded after any other methods modify createElement since they will (most likely) only take and pass tagName.
+    IDEA FROM: https://twitter.com/jonathansampson/status/256518706916651008
 */
 window.perfshim("createElement", function ()
 {
@@ -28,13 +30,13 @@ window.perfshim("createElement", function ()
             {
                 for (var property in properties)
                 {
-                    if (element[property] !== undefined)
+                    if (properties.hasOwnProperty(property) && (element[property] !== undefined))
                     {
                         element[property] = properties[property];
                     }
                 }
             }
             return element;
-        }
+        };
     }
 });

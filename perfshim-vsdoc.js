@@ -1,5 +1,5 @@
 ﻿/*
-	PerfShim Core 0.6
+	PerfShim Core 0.8
 
 	## PerfShim
 	The main problem with most shimming solutions is that you download to the 
@@ -25,10 +25,6 @@
 	Examples:
 		perfshim(somefunction, "Script1.js", "Script2.js", ScriptN.js");
 		perfshim("Script1.js", "Script2.js", ScriptN.js");
-
-	### History
-	Version 0.5
-	* First public release, includes shim for addEventListener and its dependency extendDOM.
 */
 
 (function ()
@@ -36,7 +32,7 @@
 	var globalEval = window.execScript || eval; // Makes "eval" work in global scope. Used to execute user given scripts once browser is "patched".
 	var scriptUrls; // Collection of URLs to load scripts from.
 	var scripts = []; // Collection of script to execute once browser is "patched".
-	var loadedShims = {}; // True means that the shim is either loaded or doesn't need to be loaded (not used or browser implements).
+	var loadedShims = {}; // undefined means that the shim isn't needed. False means it is being loaded. Function means it is loaded.
 	var callbackFunction = null; // Function to be called once browser is ready, if provided by user.
 	var totalScripts = 0; // Stores total amount of user scripts. Used to check if scripts is full yet.
 
@@ -68,52 +64,105 @@
 	//  url: the url to download the script from.
 	//  scriptNeeds: a function that takes a script as the only parameter. returns if the script requires the ability that the shim patches.
 	//  envrionmentNeeds: a function that returns if the browser needs to be patched or not.
-	//  dependencies: an array of the name of other shims that this shim requires to be loaded first.
+	//  dependencies: a function that returns an array of the name of other shims that this shim requires to be loaded first.
+	// shimes may have additional properties, the list above is just the minimal.
 	// The order of the shims does matter because they WILL be executed in that order. This allows you to make sure that shims don't mess each other up.
 	var shims =
 	{
-		extendDOM:
+		"Element-Prototype":
 		{
-			name: "extendDOM",
-			url: "extendDOM-vsdoc.js",
-			environmentNeeds: function ()
-			{
-				return true;
-			},
+			name: "Element-Prototype",
+			url: "Element-Prototype-vsdoc.js",
+			regex: /(?:\s|;|^|(?:window\.))Element\.prototype(?:(?:\.\w)|\[)/,
 			scriptNeeds: function (script)
 			{
-				return false;
+				return this.regex.test(script);
 			},
-			dependencies: []
+			environmentNeeds: function ()
+			{
+				return (window.Element === undefined);
+			},
+			dependencies: function ()
+			{
+				return [];
+			}
+		},
+		"HTMLElement-Prototype":
+		{
+			name: "HTMLElement-Prototype",
+			url: "HTMLElement-Prototype-vsdoc.js",
+			regex: /(?:\s|;|^|(?:window\.))HTMLElement\.prototype(?:(?:\.\w)|\[)/,
+			scriptNeeds: function (script)
+			{
+				return this.regex.test(script);
+			},
+			environmentNeeds: function ()
+			{
+				return (window.HTMLElement === undefined);
+			},
+			dependencies: function ()
+			{
+				return [];
+			}
 		},
 		addEventListener:
 		{
 			name: "addEventListener",
 			url: "addEventListener-vsdoc.js",
+			regex: new RegExp("(((\\w|])(\\[(\"|')addEventListener\\5\\]))|(\\w\\.addEventListener))(\\(|\\.call\\(|\\.apply\\(|\\[(\"|')call\\8\\]\\(|\\[(\"|')apply\\9\\]\\()"),
 			scriptNeeds: function (script)
 			{
-				return (script.indexOf("addEventListener") !== -1);
+				return this.regex.test(script);
 			},
 			environmentNeeds: function ()
 			{
 				return (typeof getTestElement().addEventListener !== "function");
 			},
-			dependencies: ["extendDOM"]
+			dependencies: function ()
+			{
+				if ((loadedShims["Element-Prototype"] === undefined) && (loadedShims["HTMLElement-Prototype"] === undefined) && shims["Element-Prototype"].environmentNeeds() && shims["HTMLElement-Prototype"].environmentNeeds())
+				{
+					return ["Element-Prototype"];
+				}
+				return [];
+			}
 		},
+		arrayIndexOf:
+		{
+			name: "arrayIndexOf",
+			url: "arrayIndexOf-vsdoc.js",
+			regex: new RegExp("(((\\w|])(\\[(\"|')IndexOf\\5\\]))|(\\w\\.IndexOf))(\\(|\\.call\\(|\\.apply\\(|\\[(\"|')call\\8\\]\\(|\\[(\"|')apply\\9\\]\\()"),
+			scriptNeeds: function (script)
+			{
+				return this.regex.test(script);
+			},
+			environmentNeeds: function ()
+			{
+				return Array.prototype.indexOf === undefined;
+			},
+			dependencies: function ()
+			{
+				return [];
+			}
+		}/*,
 		createElement:
 		{
 			name: "createElement",
 			url: "createElement-vsdoc.js",
+			regex: new RegExp("document\\.createElement\\((\"|')\\w+\\1,"),
 			environmentNeeds: function ()
 			{
 				return (document.createElement.length === 1);
 			},
 			scriptNeeds: function (script)
 			{
-				return true;
+				return this.regex.test(script);
 			},
-			dependencies: []
-		}
+			dependencies: function ()
+			{
+				return [];
+			}
+		}*/
 	};
 
 	function loadShim(shim)
@@ -129,10 +178,11 @@
 		if (loadedShims[shim.name] === undefined)
 		{
 			// Check dependencies
-			for (var dependencyIndex = 0; dependencyIndex < shim.dependencies.length; dependencyIndex++)
+			var dependencies = shim.dependencies();
+			for (var dependencyIndex = 0; dependencyIndex < dependencies.length; dependencyIndex++)
 			{
 				// Get the dependency
-				var dependancyShim = shims[shim.dependencies[dependencyIndex]];
+				var dependancyShim = shims[dependencies[dependencyIndex]];
 				// If the environment needs the dependency, load it.
 				if (dependancyShim.environmentNeeds())
 				{
@@ -158,16 +208,15 @@
 		/// </summary>
 
 		// Make sure all scripts have been downloaded and processed.
-		if ((scriptUrls.length != 0) || (scripts.length != totalScripts))
+		if ((scriptUrls.length !== 0) || (scripts.length !== totalScripts))
 		{
 			return;
 		}
 
 		// If any needed shim is not there exit
-		var shim;
-		for (shim in loadedShims)
+		for (var shim in loadedShims)
 		{
-			if (loadedShims[shim] === false)
+			if (loadedShims.hasOwnProperty(shim) && (loadedShims[shim] === false))
 			{
 				return;
 			}
@@ -185,9 +234,9 @@
 		}
 
 		// run each shim.
-		for (shimName in shims)
+		for (var shimName in shims)
 		{
-			if (typeof loadedShims[shimName] === "function")
+			if (shims.hasOwnProperty(shimName) && (typeof loadedShims[shimName] === "function"))
 			{
 				loadedShims[shimName]();
 			}
@@ -203,6 +252,43 @@
 		if (callbackFunction)
 		{
 			callbackFunction();
+		}
+	}
+
+	function xhr_onreadystagechange()
+	{
+		// Only care if the request is done.
+		if (this.readyState === 4)
+		{
+			if (this.status !== 200)
+			{
+				throw new Error("Unable to download script");
+			}
+
+			var contentType = this.getResponseHeader("Content-Type");
+			if (contentType.indexOf("javascript") !== contentType.length - 10)
+			{
+				throw new Error("PerfShim was given a 'script' that is not a script");
+			}
+
+			// Check if each shim is need.
+			for (var shimName in shims)
+			{
+				if (shims.hasOwnProperty(shimName))
+				{
+					var shim = shims[shimName];
+					// If the shim has not been required by another script and is needed in the browser and is needed by the current script, load it.
+					if ((loadedShims[shimName] === undefined) && shim.environmentNeeds() && shim.scriptNeeds(this.responseText))
+					{
+						loadShim(shim);
+					}
+				}
+			}
+
+			// Store the script to be executed once the environment is "safe".
+			scripts.push(this.responseText);
+
+			readyYet();
 		}
 	}
 
@@ -226,7 +312,7 @@
 			{
 				scriptsStartIndex = 1;
 				callbackFunction = arguments[0];
-				if (arguments.length == 1)
+				if (arguments.length === 1)
 				{
 					throw new Error("PerfShim requires at least one script to be loaded.");
 				}
@@ -305,39 +391,7 @@
 			var xhr = new XMLHttpRequest();
 			var scriptUrl = scriptUrls.pop();
 			xhr.open("GET", scriptUrl);
-			xhr.onreadystatechange = function ()
-			{
-				// Only care if the request is done.
-				if (xhr.readyState === 4)
-				{
-					if (xhr.status !== 200)
-					{
-						throw new Error("Unable to download script");
-					}
-
-					var contentType = xhr.getResponseHeader("Content-Type");
-					if (contentType.indexOf("javascript") !== contentType.length - 10)
-					{
-						throw new Error("PerfShim was given a 'script' that is not a script");
-					}
-
-					// Check if each shim is need.
-					for (var shimName in shims)
-					{
-						var shim = shims[shimName];
-						// If the shim has not been required by another script and is needed in the browser and is needed by the current script, load it.
-						if ((loadedShims[shimName] === undefined) && shim.environmentNeeds() && shim.scriptNeeds(xhr.responseText))
-						{
-							loadShim(shim);
-						}
-					}
-
-					// Store the script to be executed once the environment is "safe".
-					scripts.push(xhr.responseText);
-
-					readyYet();
-				}
-			};
+			xhr.onreadystatechange = xhr_onreadystagechange;
 			xhr.send();
 		}
 	};

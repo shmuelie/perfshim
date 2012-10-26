@@ -24,7 +24,17 @@ Examples:
 	perfshim("Script1.js", "Script2.js", ScriptN.js");
 
 ### History
-Verions 0.6
+Version 0.8
+* Lots of bug fixes
+* removed createElement shim from list
+* added shim for Array.indexOf
+* removed extendDOM shim
+* added Element and HTMLElement shims (which replace the removed extendDOM shim).
+* lots of comments
+* regular expression based processing of scripts for shims
+* new dependency system for shims.
+
+Version 0.6
 * lots of bug fixes
 * new shim for createElement
 * added test case for addEventListener

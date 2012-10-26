@@ -6,7 +6,8 @@ window.perfshim("addEventListener", function ()
 {
     if (typeof window.addEventListener !== "function")
     {
-        extendDomElement("addEventListener", function (sEventType, fListener, useCapture)
+        var elmt = Element || HTMLElement;
+        elmt.prototype.addEventListener = function (sEventType, fListener, useCapture)
         {
             /// <summary>
             ///     Registers an event handler for the specified event type. 
@@ -37,7 +38,8 @@ window.perfshim("addEventListener", function ()
                 fns.push(this[onName]);
                 this[onName] = null;
             }
-            if (!isFunction)
+            // At this point if there is a function it is "ours" so only create "our" function if it's "empty".
+            if ((this[onName] === undefined) || (this[onName] === null))
             {
                 var $this = this;
                 this[onName] = function (oEvent)
@@ -53,13 +55,13 @@ window.perfshim("addEventListener", function ()
                     {
                         fns[fnIndex].call($this, oEvent);
                     }
-                }
+                };
                 this[onName].functions = [];
             }
             this[onName].functions = this[onName].functions.concat(fns);
-        });
+        };
 
-        extendDomElement("removeEventListener", function (sEventType, fListener, useCapture)
+        elmt.prototype.removeEventListener = function (sEventType, fListener, useCapture)
         {
             /// <summary>
             ///     Removes an event handler that the addEventListener method registered.
@@ -78,13 +80,18 @@ window.perfshim("addEventListener", function ()
 
 
             var onName = "on" + sEventType;
+            // If "our" function isn't there don't do anything
+            if ((typeof this[onName] !== "function") || (this[onName].functions === undefined))
+            {
+                return;
+            }
             // Search for the function
             var itemIndex = this[onName].functions.indexOf(fListener);
             // If found remove.
-            if (itemIndex != -1)
+            if (itemIndex !== -1)
             {
                 this[onName].functions.splice(itemIndex, 1);
             }
-        });
+        };
     }
 });
