@@ -1,5 +1,5 @@
 ﻿/*
-	PerfShim Core 0.8
+	PerfShim Core 1.0.0.0
 
 	## PerfShim
 	The main problem with most shimming solutions is that you download to the 
@@ -54,6 +54,8 @@
 		/// </summary>
 		/// <returns domElement="true" />
 
+		// So that the element doesn't need to be recreated over and over it is stored as a property of the function.
+		// The reason it is not stored as a normal variable is so that if it is never needed it is never created.
 		getTestElement.element = getTestElement.element || document.createElement("div");
 		return getTestElement.element;
 	}
@@ -65,7 +67,7 @@
 	//  scriptNeeds: a function that takes a script as the only parameter. returns if the script requires the ability that the shim patches.
 	//  envrionmentNeeds: a function that returns if the browser needs to be patched or not.
 	//  dependencies: a function that returns an array of the name of other shims that this shim requires to be loaded first.
-	// shimes may have additional properties, the list above is just the minimal.
+	// Shims may have additional properties, the list above is just the minimal.
 	// The order of the shims does matter because they WILL be executed in that order. This allows you to make sure that shims don't mess each other up.
 	var shims =
 	{
@@ -265,6 +267,7 @@
 				throw new Error("Unable to download script");
 			}
 
+			// Make sure the response is JavaScript
 			var contentType = this.getResponseHeader("Content-Type");
 			if (contentType.indexOf("javascript") !== contentType.length - 10)
 			{
@@ -305,6 +308,7 @@
 			throw new Error("PerfShim requires at least one script to be loaded.");
 		}
 
+		// Make sure there is at least one script to load.
 		var scriptsStartIndex = 0;
 		if (typeof arguments[0] !== "string")
 		{
@@ -323,6 +327,7 @@
 			}
 		}
 
+		// Make sure that each script argument is a string.
 		for (var argIndex = 1; argIndex < arguments.length; argIndex++)
 		{
 			if (typeof arguments[argIndex] !== "string")
@@ -332,7 +337,7 @@
 		}
 
 		// Shim XMLHttpRequest if needed.
-		// (This shim is included here because it is needed by perfshim itself.)
+		// (This shim is included here because it is needed by perfshim itself. It may be pulled out in later versions)
 		if (window.XMLHttpRequest === undefined)
 		{
 			window.XMLHttpRequest = function ()

@@ -24,6 +24,16 @@ Examples:
 	perfshim("Script1.js", "Script2.js", ScriptN.js");
 
 ### History
+Note about versions: The major and minor are used for the perfshim core 
+(perfshim.js), the revision is used to signify new shims , and the build is 
+used for updates to existing shims. The three "sections" will increase 
+independently of each other.
+
+Version 1.0.0.0
+* more comments.
+* logo.
+* minified versions.
+
 Version 0.8
 * Lots of bug fixes
 * removed createElement shim from list

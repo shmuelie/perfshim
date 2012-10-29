@@ -24,6 +24,7 @@ window.perfshim("arrayIndexOf", function ()
             ///     The index of the first occurrence of value within the range of elements in this instance that extends from startIndex to the last element, if found; otherwise, the lower bound of the array minus 1. 
             /// </returns>
 
+            // Either use the default comparer ('===' which is what the ES5 version uses) or the provided one.
             comparer = comparer || function (a, b)
             {
                 return (a === b);

@@ -1,28 +1,33 @@
 ﻿/*
-    HTMLElement.prototype Shim
-    Allows the HTMLElement object to be used to access the prototype of DOM elements.
+    extendDOM Shim
+    Allows for DOM super type elements to be extended even in browsers that do 
+    not support it.
+
+    Because of the fact that even in browsers that allow DOM super types to be
+    edited differ in how to do it, the shim always wraps the logic. The 
+    difference is in that to the user the differences are abstracted and if
+    need the ability is added.
 */
-window.perfshim("HTMLElement-Prototype", function ()
+window.perfshim("extendDOM", function ()
 {
-    if (window.HTMLElement === undefined)
+    var addedFunctions = {};
+
+    // If the Element and the HTMLElement objects do not exist then the real Shim is really needed
+    if (!window.Element && !window.HTMLElement)
     {
-        window.HTMLElement = function ()
-        {
-            /// <summary>
-            ///     Doesn't really point at a base class for DOM elements. Instead is used as a 'proxy'.
-            /// <summary />
-            /// <returns type="HTMLElement" />
-        };
+        /*
+        The shim works by replacing calls to document.createElement, 
+        document.getElementById, document.getElementsByTagName, and
+        document.getElementsByName with custom methods. The custom methods
+        call the original method and then adds the consume items to the
+        returned object(s).
+        */
 
         // Store the original functions so we can call them in the custom one.
         var origCreateElement = document.createElement;
         var origGetElementById = document.getElementById;
         var origGetElementsByTagName = document.getElementsByTagName;
         var origGetElementsByName = document.getElementsByName;
-
-        /*
-        For each function we create a function that calls the original and then loops through the added properties adding them to the returned element(s).
-        */
 
         document.createElement = function (tagName)
         {
@@ -35,11 +40,11 @@ window.perfshim("HTMLElement-Prototype", function ()
             /// <returns domElement="true" />
 
             var elmt = origCreateElement(tagName);
-            for (var name in HTMLElement.prototype)
+            for (var name in addedFunctions)
             {
-                if (HTMLElement.prototype.hasOwnProperty(name))
+                if (addedFunctions.hasOwnProperty(name))
                 {
-                    elmt[name] = HTMLElement.prototype[name];
+                    elmt[name] = addedFunctions[name];
                 }
             }
             return elmt;
@@ -56,11 +61,11 @@ window.perfshim("HTMLElement-Prototype", function ()
             /// <returns domElement="true" />
 
             var elmt = origGetElementById(elementId);
-            for (var name in HTMLElement.prototype)
+            for (var name in addedFunctions)
             {
-                if (HTMLElement.prototype.hasOwnProperty(name))
+                if (addedFunctions.hasOwnProperty(name))
                 {
-                    elmt[name] = HTMLElement.prototype[name];
+                    elmt[name] = addedFunctions[name];
                 }
             }
             return elmt;
@@ -79,11 +84,11 @@ window.perfshim("HTMLElement-Prototype", function ()
             var elmts = origGetElementsByTagName(tagName);
             for (var i = 0; i < elmts.length; i++)
             {
-                for (var name in HTMLElement.prototype)
+                for (var name in addedFunctions)
                 {
-                    if (HTMLElement.prototype.hasOwnProperty(name))
+                    if (addedFunctions.hasOwnProperty(name))
                     {
-                        elmts[i][name] = HTMLElement.prototype[name];
+                        elmts[i][name] = addedFunctions[name];
                     }
                 }
             }
@@ -103,15 +108,41 @@ window.perfshim("HTMLElement-Prototype", function ()
             var elmts = origGetElementsByName(elementName);
             for (var i = 0; i < elmts.length; i++)
             {
-                for (var name in HTMLElement.prototype)
+                for (var name in addedFunctions)
                 {
-                    if (HTMLElement.prototype.hasOwnProperty(name))
+                    if (addedFunctions.hasOwnProperty(name))
                     {
-                        elmts[i][name] = HTMLElement.prototype[name];
+                        elmts[i][name] = addedFunctions[name];
                     }
                 }
             }
             return elmts;
         };
     }
+
+    window.extendDomElement = function (name, fn)
+    {
+        /// <summary>
+        ///     Extends DOM elements in Cross-Browser manner.
+        /// </summer>
+        /// <param name="name" type="String">
+        ///     Name of the new field.
+        /// </param>
+        /// <param name="fn" type="Object">
+        ///     The value of the new field (usually a function but can be a value)
+        /// </param>
+
+        if (window.Element !== undefined)
+        {
+            window.Element.prototype[name] = fn;
+        }
+        else if (window.HTMLElement !== undefined)
+        {
+            window.HTMLElement.prototype[name] = fn;
+        }
+        else
+        {
+            addedFunctions[name] = fn;
+        }
+    };
 });

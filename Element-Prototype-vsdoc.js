@@ -20,6 +20,10 @@ window.perfshim("Element-Prototype", function ()
         var origGetElementsByTagName = document.getElementsByTagName;
         var origGetElementsByName = document.getElementsByName;
 
+        /*
+            For each function we create a function that calls the original and then loops through the added properties adding them to the returned element(s).
+        */
+
         document.createElement = function (tagName)
         {
             /// <summary>

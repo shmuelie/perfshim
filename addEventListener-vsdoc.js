@@ -24,8 +24,9 @@ window.perfshim("addEventListener", function ()
             ///     &10;False: Register the event handler for the bubbling phase. 
             /// </param>
 
-            var onName = "on" + sEventType;
+            var onName = "on" + sEventType;                          // Both of the following are needed many times so to save time they are stored.
             var isFunction = (typeof this[onName] === "function");
+
             if ((!isFunction) && (this[onName] !== undefined) && (this[onName] !== null))
             {
                 throw Error("The property '" + onName + "' for object '" + this.toString() + "' is set to something that is non-standard");
@@ -50,6 +51,7 @@ window.perfshim("addEventListener", function ()
                         oEvent = window.event;
                     }
 
+                    // Execute each function that has been registered for the event.
                     var fns = arguments.callee.functions;
                     for (var fnIndex = 0; fnIndex < fns.length; fnIndex++)
                     {
@@ -58,6 +60,7 @@ window.perfshim("addEventListener", function ()
                 };
                 this[onName].functions = [];
             }
+            // By now we know there is a function and it is "ours" so add the functions to the internal array.
             this[onName].functions = this[onName].functions.concat(fns);
         };
 
