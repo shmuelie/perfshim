@@ -7,9 +7,10 @@
 */
 window.perfshim("createElement", function ()
 {
+    "use strict";
     if (document.createElement.length === 1)
     {
-        var origCreateElement = document.createElement;
+        var originalCreateElement = document.createElement;
 
         document.createElement = function (tagName, properties)
         {
@@ -25,7 +26,7 @@ window.perfshim("createElement", function ()
             /// </param>
             /// <returns domElement="true" />
 
-            var element = origCreateElement(tagName);
+            var element = originalCreateElement(tagName);
             if (typeof properties === "object")
             {
                 for (var property in properties)

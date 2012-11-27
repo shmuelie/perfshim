@@ -4,6 +4,7 @@
 */
 window.perfshim("HTMLElement-Prototype", function ()
 {
+    "use strict";
     if (window.HTMLElement === undefined)
     {
         window.HTMLElement = function ()
@@ -15,10 +16,10 @@ window.perfshim("HTMLElement-Prototype", function ()
         };
 
         // Store the original functions so we can call them in the custom one.
-        var origCreateElement = document.createElement;
-        var origGetElementById = document.getElementById;
-        var origGetElementsByTagName = document.getElementsByTagName;
-        var origGetElementsByName = document.getElementsByName;
+        var originalCreateElement = document.createElement;
+        var originalGetElementById = document.getElementById;
+        var originalGetElementsByTagName = document.getElementsByTagName;
+        var originalGetElementsByName = document.getElementsByName;
 
         /*
         For each function we create a function that calls the original and then loops through the added properties adding them to the returned element(s).
@@ -34,15 +35,15 @@ window.perfshim("HTMLElement-Prototype", function ()
             /// </param>
             /// <returns domElement="true" />
 
-            var elmt = origCreateElement(tagName);
-            for (var name in HTMLElement.prototype)
+            var element = originalCreateElement(tagName);
+            for (var name in window.HTMLElement.prototype)
             {
-                if (HTMLElement.prototype.hasOwnProperty(name))
+                if (window.HTMLElement.prototype.hasOwnProperty(name))
                 {
-                    elmt[name] = HTMLElement.prototype[name];
+                    element[name] = window.HTMLElement.prototype[name];
                 }
             }
-            return elmt;
+            return element;
         };
 
         document.getElementById = function (elementId)
@@ -55,15 +56,15 @@ window.perfshim("HTMLElement-Prototype", function ()
             /// </param>
             /// <returns domElement="true" />
 
-            var elmt = origGetElementById(elementId);
-            for (var name in HTMLElement.prototype)
+            var element = originalGetElementById(elementId);
+            for (var name in window.HTMLElement.prototype)
             {
-                if (HTMLElement.prototype.hasOwnProperty(name))
+                if (window.HTMLElement.prototype.hasOwnProperty(name))
                 {
-                    elmt[name] = HTMLElement.prototype[name];
+                    element[name] = window.HTMLElement.prototype[name];
                 }
             }
-            return elmt;
+            return element;
         };
 
         document.getElementsByTagName = function (tagName)
@@ -76,18 +77,19 @@ window.perfshim("HTMLElement-Prototype", function ()
             /// </param>
             /// <returns type="Array" elementDomElement="true" />
 
-            var elmts = origGetElementsByTagName(tagName);
-            for (var i = 0; i < elmts.length; i++)
+            var elements = originalGetElementsByTagName(tagName);
+            var elementsLength = elements.length;
+            for (var elementIndex = 0; elementIndex < elementsLength; elementIndex++)
             {
-                for (var name in HTMLElement.prototype)
+                for (var name in window.HTMLElement.prototype)
                 {
-                    if (HTMLElement.prototype.hasOwnProperty(name))
+                    if (window.HTMLElement.prototype.hasOwnProperty(name))
                     {
-                        elmts[i][name] = HTMLElement.prototype[name];
+                        elements[elementIndex][name] = window.HTMLElement.prototype[name];
                     }
                 }
             }
-            return elmts;
+            return elements;
         };
 
         document.getElementsByName = function (elementName)
@@ -100,18 +102,19 @@ window.perfshim("HTMLElement-Prototype", function ()
             /// </param>
             /// <returns type="Array" elementDomElement="true" />
 
-            var elmts = origGetElementsByName(elementName);
-            for (var i = 0; i < elmts.length; i++)
+            var elements = originalGetElementsByName(elementName);
+            var elementsLength = elements.length;
+            for (var elementIndex = 0; elementIndex < elementsLength; elementIndex++)
             {
-                for (var name in HTMLElement.prototype)
+                for (var name in window.HTMLElement.prototype)
                 {
-                    if (HTMLElement.prototype.hasOwnProperty(name))
+                    if (window.HTMLElement.prototype.hasOwnProperty(name))
                     {
-                        elmts[i][name] = HTMLElement.prototype[name];
+                        elements[elementsLength][name] = window.HTMLElement.prototype[name];
                     }
                 }
             }
-            return elmts;
+            return elements;
         };
     }
 });

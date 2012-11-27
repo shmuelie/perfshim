@@ -4,6 +4,7 @@
 */
 window.perfshim("arrayIndexOf", function ()
 {
+    "use strict";
     if (typeof Array.prototype.indexOf !== "function")
     {
         Array.prototype.indexOf = function (value, startIndex, comparer)
@@ -15,7 +16,7 @@ window.perfshim("arrayIndexOf", function ()
             ///     The object to locate in this instance.
             /// </param>
             /// <param name="startIndex" type="Number" integer="true" optional="true">
-            ///     The starting index of the search. 0 (zero) is valid in an empty array.
+            ///     The starting index of the search. 0 (zero) is valid in an empty array. If negative search will be relative to the end of the array (-1 is the last item for example).
             /// </param>
             /// <param name="comparer" type="Function" optional="true">
             ///     A function to compare the items with. If left empty "===" is used.
@@ -30,11 +31,30 @@ window.perfshim("arrayIndexOf", function ()
                 return (a === b);
             };
 
-            for (var i = (startIndex || 0); i < this.length; i++)
+            if (typeof startIndex === "string") // If startIndex is a string, try to parse it.
             {
-                if (comparer(this[i], value))
+                startIndex = parseInt(startIndex, 10);
+            }
+
+            var arrayLength = this.length;
+            if ((startIndex === null) || (startIndex === undefined) || (startIndex !== startIndex)) // If startIndex is not given or it is NaN, set to 0.
+            {
+                startIndex = 0;
+            }
+            else
+            {
+                startIndex = Math.floor(startIndex); // If startIndex is not an integer, round down.
+                if (startIndex < 0) // If startIndex is less than zero, make it relative to the end of the array.
                 {
-                    return i;
+                    startIndex = arrayLength + startIndex;
+                }
+            }
+
+            for (var arrayIndex = startIndex ; arrayIndex < arrayLength; arrayIndex++)
+            {
+                if (comparer(this[arrayIndex], value))
+                {
+                    return arrayIndex;
                 }
             }
             return -1;

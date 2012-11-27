@@ -2,20 +2,22 @@
     addEventListener Shim
     Allows the use of addEventListener in browsers that do not implement it.
 */
+/*global Element:true */
 window.perfshim("addEventListener", function ()
 {
+    "use strict";
     if (typeof window.addEventListener !== "function")
     {
-        var elmt = Element || HTMLElement;
-        elmt.prototype.addEventListener = function (sEventType, fListener, useCapture)
+        var rootElement = Element || HTMLElement;
+        rootElement.prototype.addEventListener = function (eventType, listenerFunction, useCapture)
         {
             /// <summary>
             ///     Registers an event handler for the specified event type. 
             /// </summary>
-            /// <param name="sEventType" type="String">
+            /// <param name="eventType" type="String">
             ///     The type of event type to register. 
             /// </param>
-            /// <param name="fListener" type="Function">
+            /// <param name="listenerFunction" type="Function">
             ///     The event handler function to associate with the event. 
             /// </param>
             /// <param name="useCapture" type="Boolean" optional="true">
@@ -24,26 +26,26 @@ window.perfshim("addEventListener", function ()
             ///     &10;False: Register the event handler for the bubbling phase. 
             /// </param>
 
-            var onName = "on" + sEventType;                          // Both of the following are needed many times so to save time they are stored.
+            var onName = "on" + eventType; // Both of the following are needed many times so to save time they are stored.
             var isFunction = (typeof this[onName] === "function");
 
             if ((!isFunction) && (this[onName] !== undefined) && (this[onName] !== null))
             {
-                throw Error("The property '" + onName + "' for object '" + this.toString() + "' is set to something that is non-standard");
+                throw new Error("The property '" + onName + "' for object '" + this.toString() + "' is set to something that is non-standard");
             }
 
-            var fns = [fListener];
+            var listenerFunctions = [listenerFunction];
             // If there is already a event function and it's not "ours" then add it to the collection too.
             if (isFunction && (this[onName].functions === undefined))
             {
-                fns.push(this[onName]);
+                listenerFunctions.push(this[onName]);
                 this[onName] = null;
             }
             // At this point if there is a function it is "ours" so only create "our" function if it's "empty".
             if ((this[onName] === undefined) || (this[onName] === null))
             {
                 var $this = this;
-                this[onName] = function (oEvent)
+                this[onName] = function eventLoop (oEvent)
                 {
                     // Some browsers use a global event object instead of passing it as a parameter.
                     if (!oEvent)
@@ -52,27 +54,27 @@ window.perfshim("addEventListener", function ()
                     }
 
                     // Execute each function that has been registered for the event.
-                    var fns = arguments.callee.functions;
-                    for (var fnIndex = 0; fnIndex < fns.length; fnIndex++)
+                    var functionsLength = eventLoop.functions.length;
+                    for (var functionsIndex = 0; functionsIndex < functionsLength; functionsIndex++)
                     {
-                        fns[fnIndex].call($this, oEvent);
+                        eventLoop.functions[functionsIndex].call($this, oEvent);
                     }
                 };
                 this[onName].functions = [];
             }
             // By now we know there is a function and it is "ours" so add the functions to the internal array.
-            this[onName].functions = this[onName].functions.concat(fns);
+            this[onName].functions = this[onName].functions.concat(listenerFunctions);
         };
 
-        elmt.prototype.removeEventListener = function (sEventType, fListener, useCapture)
+        rootElement.prototype.removeEventListener = function (eventType, listenerFunction, useCapture)
         {
             /// <summary>
             ///     Removes an event handler that the addEventListener method registered.
             /// </summary>
-            /// <param name="sEventType" type="String">
+            /// <param name="eventType" type="String">
             ///     The event type that the event handler is registered for. 
             /// </param>
-            /// <param name="fListener" type="Function">
+            /// <param name="listenerFunction" type="Function">
             ///     The event handler function to remove.
             /// </param>
             /// <param name="useCapture" type="Boolean" optional="true">
@@ -82,14 +84,14 @@ window.perfshim("addEventListener", function ()
             /// </param>
 
 
-            var onName = "on" + sEventType;
+            var onName = "on" + eventType;
             // If "our" function isn't there don't do anything
             if ((typeof this[onName] !== "function") || (this[onName].functions === undefined))
             {
                 return;
             }
             // Search for the function
-            var itemIndex = this[onName].functions.indexOf(fListener);
+            var itemIndex = this[onName].functions.indexOf(listenerFunction);
             // If found remove.
             if (itemIndex !== -1)
             {
