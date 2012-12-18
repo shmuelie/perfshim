@@ -1,40 +1,44 @@
-﻿## PerfShim
-The main problem with most shimming solutions is that you download to the 
-browser and force it to parse and possibly execute code that is unnecessary. 
+﻿# PerfShim
+The main problem with most shimming solutions is that you download the code for 
+the shim to to the browser, parse it, and even execute the code even though the 
+browser or page does not need the shim. This not only take longer but in an 
+increasingly mobile world the amount of data that needs to be downloaded should 
+be minimized. 
 
-PerfShim (short for Performance Shim) solves this problem by analyzing your 
-code. Then for each shim able code you use it check if the browser needs it. 
-Only if both of those are true does it download a separate files, one per shim, 
-that make the browser "safe" for your code.
+PerfShim (short for Performance Shim) solves these problems in an interesting 
+way. Instead of including ever shim ever created to be downloaded, PerfShim 
+analyzes your pages scripts, checks which shims are used by the scripts, check 
+if the shims are needed by the browser, and if they are needed downloads them.
 
-### How To Use PerfShim
-To use PerfShim on a page you start by including the perfshim-vsdoc.js file on 
+## How To Use PerfShim
+To use PerfShim on a page you start by including the perfshim.min.js file on 
 your page. You do not include any of the scripts from your site that you want 
-to use on the page In an inline script on the page you call the perfshim 
-function. 
+to use on the page, PerfShim will download them for you. In an inline script 
+on the page you call the perfshim function. 
 
 PerfShim can be called in two ways: legacy or objective.
 
-*	Legacy: A simple function call that consist of one or more arguments being 
-	passed. If the first argument is a function then it is the callback method. 
-	Every other argument (and the first if not a function) must be a string that 
-	points to a script in the same origin as the webpage to be analyzed and then 
-	executed once all shims are run. This mode is here for backward compatibility 
-	with version 1.0
+### Legacy: 
+A simple function call that consist of one or more arguments being passed. If 
+the first argument is a function then it is the callback method. Every other 
+argument (and the first if not a function) must be a string that points to a 
+script in the same origin as the webpage to be analyzed and then executed once 
+all shims are run. This mode is here for backward compatibility with version 1.0
 	
-	Examples:
+#### Examples:
 
 		perfshim(somefunction, "Script1.js", "Script2.js", ScriptN.js");
 		perfshim("Script1.js", "Script2.js", ScriptN.js");
 
-*	Objective: A function call where the only parameter should be an object 
-	formatted based on the formatting bellow. It will be merged with the base 
-	options as well as normalized for the following "ease of use" rules:
+### Objective: 
+A function call where the only parameter should be an object formatted based on 
+the formatting bellow. It will be merged with the base options as well as 
+normalized for the following "ease of use" rules:
 
-	1. Any options that take an array may have their value set to the 
-	only value directly.
-	2. executeScripts and noExecuteScripts can be set set as string(s)
-	instead of objects if the script is not cross domain.
+1. Any options that take an array may have their value set to the only value 
+   directly.
+2. executeScripts and noExecuteScripts can be set set as string(s) instead of 
+   objects if the script is not cross domain.
 
 #### Objective Mode Object Scheme
 	{
@@ -79,11 +83,50 @@ PerfShim can be called in two ways: legacy or objective.
 		neverShims: []
 	}
 
-### History
+#### Examples
+Downloads Script1.js and Script2.js form the same domain, analyzes them and 
+then executes them
+
+	perfshim({executeScripts: ["Script1.js", "Script2.js"]);
+
+Downloads just Script.js (shows using shortcut for single items in a field that 
+is normally an array)
+
+	pershim({executeScripts: "Script.js"});
+
+Downloads otherdomain.com/Script.js and Script.js
+
+	perfshim({executeScripts: ["Script.js", {url:"otherdomain.com/Script.js", type: "json", method: "callback"}]);
+
+## How it Works
+PerfShim works in a simple 7 step process:
+
+1. Detect which calling "method" was used. Then check on the parameter(s) that 
+   can be checked in all environments. 
+2. To work PerfShim requires some shims. Some are used to just check the 
+   parameters, others are used to do its job. 
+3. This step is skipped if the calling "method" was legacy. If though the 
+   calling method was "objective" then a second round of parameter verification 
+   occurs. These validations may require shims to run so could not run in the 
+   first pass.
+4. Each script to be analyzed is downloaded using XMLHttpRequest if from the 
+   same origin, otherwise using JSONP.
+5. Unless disabled in "objective" mode each shim is check against each script 
+   and the browser to see if it is needed. If so it is downloaded. Shims may 
+   also be forced to download using the mustShims option.
+6. Once all the requested shims have downloaded the are executed.
+7. All scripts the user specified are to be executed are run using a global 
+   eval.
+
+## History
 Note about versions: The major and minor are used for the perfshim core 
 (perfshim.js), the revision is used to signify new shims , and the build is 
 used for updates to existing shims. The three "sections" will increase 
 independently of each other.
+
+Verions 2.01.2.6
+* README.md redone
+* Bug fixed in perfshim core
 
 Version 2.0.2.6
 * Added New Shims: isArray and typeOf.
