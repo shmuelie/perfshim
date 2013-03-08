@@ -1,5 +1,7 @@
 ﻿## Code Convention
 
+__NOTE: Some third-party shims/pollyfills will not conform to these rules perfectly. Over time they should be moved over though.__
+
 #### Short Version
 Development code should be as verbose as possible. Leave minification for production.
 
@@ -40,3 +42,4 @@ Identifiers (function, variable, and property names for example) should be as de
 * Semicolons may not be skipped.
 * Using [] style property access is only allowed if the name is not known at compile time or is not a valid identifier.
 * Switches must have more than one case. Use an IF instead.
+* The primary public function must check for every error it can to prevent misuse.

@@ -124,6 +124,13 @@ Note about versions: The major and minor are used for the perfshim core
 used for updates to existing shims. The three "sections" will increase 
 independently of each other.
 
+Version 2.3.4.6
+* Complete Redo of repo
+* Added Canvas Shim
+* Added JSON Shim
+* Removed -vsdoc from JS files
+* Fixed bug in getFirstScriptElement where the node wasn't being cached
+
 Verions 2.01.2.6
 * README.md redone
 * Bug fixed in perfshim core
