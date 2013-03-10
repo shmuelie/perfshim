@@ -291,25 +291,24 @@ window.perfshim = function ()
 			{
 				return [];
 			}
-		}/*,
+		},
 		createElement:
 		{
 			name: "createElement",
 			url: "createElement.js",
-			regex: new RegExp("document\\.createElement\\((\"|')\\w+\\1,"),
 			environmentNeeds: function ()
 			{
 				return (document.createElement.length === 1);
 			},
 			scriptNeeds: function (script)
 			{
-				return this.regex.test(script);
+				return false;
 			},
 			dependencies: function (loadedShims)
 			{
 				return [];
 			}
-		}*/
+		}
 	};
 
 	//#endregion
