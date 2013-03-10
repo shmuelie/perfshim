@@ -120,7 +120,7 @@ window.perfshim = function ()
 
 	//#region Shims
 
-	// A collection of the shims.
+	// A collection of the shims. For more details about the a shim see it's code file.
 	// A shim has the following members:
 	//  name: the name of the shim, also it's key in the collection.
 	//  url: the url to download the script from.
