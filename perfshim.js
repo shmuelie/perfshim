@@ -300,11 +300,11 @@ window.perfshim = function ()
 			{
 				return true;
 			},
-			scriptNeeds: function (script)
+			scriptNeeds: function ()
 			{
 				return false;
 			},
-			dependencies: function (loadedShims)
+			dependencies: function ()
 			{
 				return [];
 			}
