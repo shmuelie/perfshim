@@ -352,33 +352,6 @@ window.perfshim = function ()
 		}
 	}
 
-	function loadScriptFile(url)
-	{
-		/// <summary>
-		///     Loads a script file.
-		/// </summary>
-		/// <param name="url" type="String">
-		///     The URL of the script file to load.
-		/// </param>
-		/// <returns type="Function">
-		///     a function that will remove the tag from the page.
-		/// </returns>
-
-		var scriptElement = document.createElement("script");
-		scriptElement.src = url;
-		scriptElement.type = "text/javascript";
-		getFirstScriptElement().parentNode.insertBefore(scriptElement, getFirstScriptElement());
-
-		return function ()
-		{
-			/// <summary>
-			///     Removes the script tag that was added (if wanted).
-			/// </summary>
-
-			scriptElement.parentNode.removeChild(scriptElement);
-		};
-	}
-
 	function checkIfAllShimsLoaded(loadedShims, whenDoneCallback)
 	{
 		/// <summary>
@@ -404,121 +377,234 @@ window.perfshim = function ()
 		whenDoneCallback();
 	}
 
-	var callArguemets = Array.prototype.slice.call(arguments, 0);
-
-	function firstValidation()
+	function analyzeScripts()
 	{
 		/// <summary>
-		///     Does all validation that does not require a needed shim.
+		///     Analyze downloaded scripts and download shims.
 		/// </summary>
 
-		if (callArguemets.length === 0)
+		var loadedShims = {};
+
+		function checkIfScriptCollectionNeedsShim(shim, collection)
 		{
-			// No matter what mode at least one argument is required.
-			throw new Error("PerfShim requires at least one argument.");
-		}
+			/// <summary>
+			///     Checks if collection of scripts needs a shim.
+			/// </summary>
+			/// <param name="shim" type="Shim">
+			///     The shim to test for.
+			/// </param>
+			/// <param name="collection" type="Array" elementType="String">
+			///     The script collection to test.
+			/// </param>
+			/// <returns type="Boolean">
+			///     True if the shim was needed, false otherwise.
+			/// </returns>
 
-		// To decide which mode to is be required we check the number of arguments and the types.
-		if ((callArguemets.length === 1) && (typeof callArguemets[0] === "object")) // If there is only one argument and it is an object, Objective mode.
-		{
-			var userOptions = callArguemets[0];
-
-			if ((userOptions.analyze !== undefined) && (userOptions.analyze !== null) && (typeof userOptions.analyze === "boolean"))
+			var collectionLength = collection.length;
+			for (var collectionIndex = 0; collectionIndex < collectionLength; collectionIndex++)
 			{
-				options.analyze = userOptions.analyze;
-			}
-
-			// To do more validation Objective mode requires some shims.
-			checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "isArray", "typeOf"], secondValidation);
-		}
-		else // Otherwise legacy mode.
-		{
-			var agumentIndexStart = 0;
-
-			// If the first argument is a function, store it as the callback.
-			if (typeof callArguemets[0] === "function")
-			{
-				options.callbacks.push(callArguemets[0]);
-				agumentIndexStart = 1;
-			}
-
-			// Make sure that each script argument is a string.
-			var argumentsLength = callArguemets.length;
-			for (var argumentIndex = agumentIndexStart; argumentIndex < argumentsLength; argumentIndex++)
-			{
-				if (typeof callArguemets[argumentIndex] !== "string")
+				if (shim.scriptNeeds(collection[collectionIndex]))
 				{
-					throw new Error("All scripts must be strings");
+					return true;
 				}
 			}
 
-			options.executeScripts = Array.prototype.slice.call(callArguemets, agumentIndexStart);
-
-			// All validation has been done so just make sure XMLHttpRequest is there.
-			checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "typeOf"], downloadScripts);
+			return false;
 		}
-	}
 
-	function checkRequiredShims(requiredShims, whenFinishedCallback)
-	{
-		/// <summary>
-		///     Checks if the required shims need to be downloaded and if so does so.
-		/// </summary>
-		/// <param name="requiredShims" type="Array" elementType="String">
-		///     The shims that are required.
-		/// </param>
-		/// <param name="whenFinishedCallback" type="Function">
-		///     The function to call once all required shims are there.
-		/// </param>
-
-		var loadedShims = {};
-		var loadingShims = false;
-
-		var requiredShimsLength = requiredShims.length;
-		for (var requiredShimIndex = 0; requiredShimIndex < requiredShimsLength; requiredShimIndex++)
+		function executeShimsAndScripts()
 		{
-			var requiredShim = shims[requiredShims[requiredShimIndex]];
-			if (requiredShim.environmentNeeds())
+			/// <summary>
+			///     Executes the shims and then the scripts.
+			/// </summary>
+
+			for (var shimName in loadedShims)
 			{
-				loadingShims = true;
-				loadShim(requiredShim, loadedShims);
+				if (shims.hasOwnProperty(shimName) && (typeof loadedShims[shimName] === "function"))
+				{
+					loadedShims[shimName]();
+				}
+			}
+
+			var scriptsLength = options.executeScripts.length;
+			for (var scriptsIndex = 0; scriptsIndex < scriptsLength; scriptsIndex++)
+			{
+				globalEval(options.executeScripts[scriptsIndex]);
+			}
+
+			var callbacksLength = options.callbacks.length;
+			for (var callbacksIndex = 0; callbacksIndex < callbacksLength; callbacksIndex++)
+			{
+				var callback = options.callbacks[callbacksIndex];
+				switch (typeof callback)
+				{
+					case "function":
+						callback();
+						break;
+					case "string":
+						window[callback]();
+						break;
+				}
 			}
 		}
 
-		if (loadingShims)
+		window.perfshim = function (shimName, runFunction)
 		{
-			window.perfshim = function (shimName, shimFunction)
+			/// <summary>
+			///     TO ONLY BE CALLED BY PERFSHIM SHIM CODE
+			//      &10; Called by shims to signify that they are downloaded and ready to run.
+			/// </summary>
+			/// <param name="shimName" type="String">
+			///     The name of the shim.
+			/// </param>
+			/// <param name="runFunction" type="Function">
+			///     The function to call to run the shim.
+			/// </param>
+
+			loadedShims[shimName] = runFunction;
+
+			checkIfAllShimsLoaded(loadedShims, executeShimsAndScripts);
+		};
+
+		for (var shimName in shims)
+		{
+			if (shims.hasOwnProperty(shimName))
+			{
+				var shim = shims[shimName];
+				if (shim.environmentNeeds() && ((options.mustShims.indexOf(shimName) !== -1) || ((options.neverShims.indexOf(shimName) === -1) && options.analyze && (checkIfScriptCollectionNeedsShim(shim, options.executeScripts) && checkIfScriptCollectionNeedsShim(shim, options.noExecuteScripts)))))
+				{
+					loadShim(shim, loadedShims);
+				}
+			}
+		}
+
+		checkIfAllShimsLoaded(loadedShims, executeShimsAndScripts);
+	}
+
+	function downloadScripts()
+	{
+		/// <summary>
+		///     Downloads scripts.
+		/// </summary>
+
+		function checkIfAllScriptsDownloaded()
+		{
+			/// <summary>
+			///     Checks if all the scripts have downloaded.
+			/// </summary>
+
+			var executeScriptsLength = options.executeScripts.length;
+			for (var executeScriptsIndex = 0; executeScriptsIndex < executeScriptsLength; executeScriptsIndex++)
+			{
+				if (typeof options.executeScripts[executeScriptsIndex] !== "string")
+				{
+					return;
+				}
+			}
+
+			var noExecuteScriptLength = options.noExecuteScripts.length;
+			for (var noExecuteScriptsIndex = 0; noExecuteScriptsIndex < noExecuteScriptLength; noExecuteScriptsIndex++)
+			{
+				if (typeof options.noExecuteScripts[noExecuteScriptsIndex] !== "string")
+				{
+					return;
+				}
+			}
+
+			analyzeScripts();
+		}
+
+		function loopThroughScripts(name)
+		{
+			/// <summary>
+			///     Loops through a scripts collection.
+			/// </summary>
+			/// <param name="name" type="String">
+			///     The name of collection to loop through.
+			/// </param>
+
+			function innerLoop(scriptIndex)
 			{
 				/// <summary>
-				///     When shims are done loading the 'register' it with this method.
-				/// <summary>
-				/// <param name="shimName" type="String">
-				///     The name of the shim that is loaded.
-				/// </param>
-				/// <param name="shimFunction" type="Function">
-				///     The function that will execute the shim.
+				///     A function used for scoping inside the loop.
+				/// </summary>
+				/// <param name="scriptIndex">
+				///     The index of the script look at.
 				/// </param>
 
-				loadedShims[shimName] = shimFunction;
-
-				checkIfAllShimsLoaded(loadedShims, function ()
+				var script = options[name][scriptIndex];
+				if (script.type === "normal")
 				{
-					for (var loadedShim in loadedShims)
+					var xmlHttpRequest = new XMLHttpRequest();
+					xmlHttpRequest.open("GET", script.url);
+					xmlHttpRequest.onreadystatechange = function ()
 					{
-						if (loadedShims.hasOwnProperty(loadedShim) && (typeof loadedShims[loadedShim] === "function"))
+						// Only care if the request is done.
+						if (this.readyState === 4)
 						{
-							loadedShims[loadedShim]();
+							if (this.status !== 200)
+							{
+								throw new Error("Unable to download script");
+							}
+
+							// Make sure the response is JavaScript
+							var contentType = this.getResponseHeader("Content-Type");
+							if (contentType.indexOf("javascript") === -1)
+							{
+								throw new Error("PerfShim was given a 'script' that is not a script");
+							}
+
+							options[name][scriptIndex] = this.responseText;
+
+							checkIfAllScriptsDownloaded();
 						}
-					}
-					whenFinishedCallback();
-				});
-			};
+					};
+					xmlHttpRequest.send();
+				}
+				else
+				{
+					var scriptElement = document.createElement("script");
+					scriptElement.src = script.url;
+					scriptElement.type = "text/javascript";
+					getFirstScriptElement().parentNode.insertBefore(scriptElement, getFirstScriptElement());
+
+					window.perfshim = function (data)
+					{
+						/// <summary>
+						///     Called by JSONP code once downloaded.
+						/// </summary>
+						/// <param name="data" type="Object">
+						///     The JSONP script (in some form).
+						/// </param>
+
+						options[name][scriptIndex] = data.toString();
+
+						checkIfAllScriptsDownloaded();
+					};
+				}
+			}
+
+			var scriptsLength = options[name].length;
+			for (var scriptsIndex = 0; scriptsIndex < scriptsLength; scriptsIndex++)
+			{
+				innerLoop(scriptsIndex);
+			}
+		}
+
+		if ((options.executeScripts.length > 0) || (options.noExecuteScripts.length > 0))
+		{
+
+			loopThroughScripts("executeScripts");
+
+			loopThroughScripts("noExecuteScripts");
 		}
 		else
 		{
-			whenFinishedCallback();
+			analyzeScripts();
 		}
 	}
+
+	var callArguemets = Array.prototype.slice.call(arguments, 0);
 
 	function secondValidation()
 	{
@@ -699,229 +785,113 @@ window.perfshim = function ()
 		downloadScripts();
 	}
 
-	function downloadScripts()
+	function checkRequiredShims(requiredShims, whenFinishedCallback)
 	{
 		/// <summary>
-		///     Downloads scripts.
+		///     Checks if the required shims need to be downloaded and if so does so.
 		/// </summary>
+		/// <param name="requiredShims" type="Array" elementType="String">
+		///     The shims that are required.
+		/// </param>
+		/// <param name="whenFinishedCallback" type="Function">
+		///     The function to call once all required shims are there.
+		/// </param>
 
-		function checkIfAllScriptsDownloaded()
+		var loadedShims = {};
+		var loadingShims = false;
+
+		var requiredShimsLength = requiredShims.length;
+		for (var requiredShimIndex = 0; requiredShimIndex < requiredShimsLength; requiredShimIndex++)
 		{
-			/// <summary>
-			///     Checks if all the scripts have downloaded.
-			/// </summary>
-
-			var executeScriptsLength = options.executeScripts.length;
-			for (var executeScriptsIndex = 0; executeScriptsIndex < executeScriptsLength; executeScriptsIndex++)
+			var requiredShim = shims[requiredShims[requiredShimIndex]];
+			if (requiredShim.environmentNeeds())
 			{
-				if (typeof options.executeScripts[executeScriptsIndex] !== "string")
-				{
-					return;
-				}
+				loadingShims = true;
+				loadShim(requiredShim, loadedShims);
 			}
-
-			var noExecuteScriptLength = options.noExecuteScripts.length;
-			for (var noExecuteScriptsIndex = 0; noExecuteScriptsIndex < noExecuteScriptLength; noExecuteScriptsIndex++)
-			{
-				if (typeof options.noExecuteScripts[noExecuteScriptsIndex] !== "string")
-				{
-					return;
-				}
-			}
-
-			analyzeScripts();
 		}
 
-		function loopThroughScripts(name)
+		if (loadingShims)
 		{
-			/// <summary>
-			///     Loops through a scripts collection.
-			/// </summary>
-			/// <param name="name" type="String">
-			///     The name of collection to loop through.
-			/// </param>
-
-			function innerLoop(scriptIndex)
+			window.perfshim = function (shimName, shimFunction)
 			{
 				/// <summary>
-				///     A function used for scoping inside the loop.
-				/// </summary>
-				/// <param name="scriptIndex">
-				///     The index of the script look at.
+				///     When shims are done loading the 'register' it with this method.
+				/// <summary>
+				/// <param name="shimName" type="String">
+				///     The name of the shim that is loaded.
+				/// </param>
+				/// <param name="shimFunction" type="Function">
+				///     The function that will execute the shim.
 				/// </param>
 
-				var script = options[name][scriptIndex];
-				if (script.type === "normal")
+				loadedShims[shimName] = shimFunction;
+
+				checkIfAllShimsLoaded(loadedShims, function ()
 				{
-					var xmlHttpRequest = new XMLHttpRequest();
-					xmlHttpRequest.open("GET", script.url);
-					xmlHttpRequest.onreadystatechange = function ()
+					for (var loadedShim in loadedShims)
 					{
-						// Only care if the request is done.
-						if (this.readyState === 4)
+						if (loadedShims.hasOwnProperty(loadedShim) && (typeof loadedShims[loadedShim] === "function"))
 						{
-							if (this.status !== 200)
-							{
-								throw new Error("Unable to download script");
-							}
-
-							// Make sure the response is JavaScript
-							var contentType = this.getResponseHeader("Content-Type");
-							if (contentType.indexOf("javascript") === -1)
-							{
-								throw new Error("PerfShim was given a 'script' that is not a script");
-							}
-
-							options[name][scriptIndex] = this.responseText;
-
-							checkIfAllScriptsDownloaded();
+							loadedShims[loadedShim]();
 						}
-					};
-					xmlHttpRequest.send();
-				}
-				else
-				{
-					loadScriptFile(script.url);
-
-					window.perfshim = function (data)
-					{
-						/// <summary>
-						///     Called by JSONP code once downloaded.
-						/// </summary>
-						/// <param name="data" type="Object">
-						///     The JSONP script (in some form).
-						/// </param>
-
-						options[name][scriptIndex] = data.toString();
-
-						checkIfAllScriptsDownloaded();
-					};
-				}
-			}
-
-			var scriptsLength = options[name].length;
-			for (var scriptsIndex = 0; scriptsIndex < scriptsLength; scriptsIndex++)
-			{
-				innerLoop(scriptsIndex);
-			}
-		}
-
-		if ((options.executeScripts.length > 0) || (options.noExecuteScripts.length > 0))
-		{
-
-			loopThroughScripts("executeScripts");
-
-			loopThroughScripts("noExecuteScripts");
+					}
+					whenFinishedCallback();
+				});
+			};
 		}
 		else
 		{
-			analyzeScripts();
+			whenFinishedCallback();
 		}
 	}
 
-	function analyzeScripts()
+	(function ()
 	{
-		/// <summary>
-		///     Analyze downloaded scripts and download shims.
-		/// </summary>
-
-		var loadedShims = {};
-
-		function checkIfScriptCollectionNeedsShim(shim, collection)
+		if (callArguemets.length === 0)
 		{
-			/// <summary>
-			///     Checks if collection of scripts needs a shim.
-			/// </summary>
-			/// <param name="shim" type="Shim">
-			///     The shim to test for.
-			/// </param>
-			/// <param name="collection" type="Array" elementType="String">
-			///     The script collection to test.
-			/// </param>
-			/// <returns type="Boolean">
-			///     True if the shim was needed, false otherwise.
-			/// </returns>
-
-			var collectionLength = collection.length;
-			for (var collectionIndex = 0; collectionIndex < collectionLength; collectionIndex++)
-			{
-				if (shim.scriptNeeds(collection[collectionIndex]))
-				{
-					return true;
-				}
-			}
-
-			return false;
+			// No matter what mode at least one argument is required.
+			throw new Error("PerfShim requires at least one argument.");
 		}
 
-		function executeShimsAndScripts()
+		// To decide which mode to is be required we check the number of arguments and the types.
+		if ((callArguemets.length === 1) && (typeof callArguemets[0] === "object")) // If there is only one argument and it is an object, Objective mode.
 		{
-			/// <summary>
-			///     Executes the shims and then the scripts.
-			/// </summary>
+			var userOptions = callArguemets[0];
 
-			for (var shimName in loadedShims)
+			if ((userOptions.analyze !== undefined) && (userOptions.analyze !== null) && (typeof userOptions.analyze === "boolean"))
 			{
-				if (shims.hasOwnProperty(shimName) && (typeof loadedShims[shimName] === "function"))
-				{
-					loadedShims[shimName]();
-				}
+				options.analyze = userOptions.analyze;
 			}
 
-			var scriptsLength = options.executeScripts.length;
-			for (var scriptsIndex = 0; scriptsIndex < scriptsLength; scriptsIndex++)
-			{
-				globalEval(options.executeScripts[scriptsIndex]);
-			}
-
-			var callbacksLength = options.callbacks.length;
-			for (var callbacksIndex = 0; callbacksIndex < callbacksLength; callbacksIndex++)
-			{
-				var callback = options.callbacks[callbacksIndex];
-				switch (typeof callback)
-				{
-					case "function":
-						callback();
-						break;
-					case "string":
-						window[callback]();
-						break;
-				}
-			}
+			// To do more validation Objective mode requires some shims.
+			checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "isArray", "typeOf"], secondValidation);
 		}
-
-		window.perfshim = function (shimName, runFunction)
+		else // Otherwise legacy mode.
 		{
-			/// <summary>
-			///     TO ONLY BE CALLED BY PERFSHIM SHIM CODE
-			//      &10; Called by shims to signify that they are downloaded and ready to run.
-			/// </summary>
-			/// <param name="shimName" type="String">
-			///     The name of the shim.
-			/// </param>
-			/// <param name="runFunction" type="Function">
-			///     The function to call to run the shim.
-			/// </param>
+			var agumentIndexStart = 0;
 
-			loadedShims[shimName] = runFunction;
-
-			checkIfAllShimsLoaded(loadedShims, executeShimsAndScripts);
-		};
-
-		for (var shimName in shims)
-		{
-			if (shims.hasOwnProperty(shimName))
+			// If the first argument is a function, store it as the callback.
+			if (typeof callArguemets[0] === "function")
 			{
-				var shim = shims[shimName];
-				if (shim.environmentNeeds() && ((options.mustShims.indexOf(shimName) !== -1) || ((options.neverShims.indexOf(shimName) === -1) && options.analyze && (checkIfScriptCollectionNeedsShim(shim, options.executeScripts) && checkIfScriptCollectionNeedsShim(shim, options.noExecuteScripts)))))
+				options.callbacks.push(callArguemets[0]);
+				agumentIndexStart = 1;
+			}
+
+			// Make sure that each script argument is a string.
+			var argumentsLength = callArguemets.length;
+			for (var argumentIndex = agumentIndexStart; argumentIndex < argumentsLength; argumentIndex++)
+			{
+				if (typeof callArguemets[argumentIndex] !== "string")
 				{
-					loadShim(shim, loadedShims);
+					throw new Error("All scripts must be strings");
 				}
 			}
+
+			options.executeScripts = Array.prototype.slice.call(callArguemets, agumentIndexStart);
+
+			// All validation has been done so just make sure XMLHttpRequest is there.
+			checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "typeOf"], downloadScripts);
 		}
-
-		checkIfAllShimsLoaded(loadedShims, executeShimsAndScripts);
-	}
-
-	firstValidation();
+	})();
 };
