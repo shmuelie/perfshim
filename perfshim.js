@@ -1,7 +1,7 @@
 ﻿/// <reference path="types.js" />
 
 /*
-	PerfShim Core 2.3.3.6
+	PerfShim Core 2.4.4.6
 
 	# PerfShim
 	The main problem with most shimming solutions is that you download the code for
@@ -298,7 +298,7 @@ window.perfshim = function ()
 			url: "createElement.js",
 			environmentNeeds: function ()
 			{
-				return (document.createElement.length === 1);
+				return true;
 			},
 			scriptNeeds: function (script)
 			{

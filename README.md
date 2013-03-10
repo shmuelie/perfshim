@@ -124,6 +124,10 @@ Note about versions: The major and minor are used for the perfshim core
 used for updates to existing shims. The three "sections" will increase 
 independently of each other.
 
+Version 2.4.4.6
+* Added createElementShip back
+* removed getTestElement
+
 Version 2.3.4.6
 * Complete Redo of repo
 * Added Canvas Shim
