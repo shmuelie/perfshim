@@ -127,6 +127,8 @@ independently of each other.
 Version 2.4.4.6
 * Added createElementShip back
 * removed getTestElement
+* removed loadScriptFile
+* Re-orged functions
 
 Version 2.3.4.6
 * Complete Redo of repo
