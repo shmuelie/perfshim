@@ -71,19 +71,6 @@ window.perfshim = function ()
 		return getFirstScriptElement.element;
 	}
 
-	function getTestElement()
-	{
-		/// <summary>
-		///     Gets a DOM element for testing if shims are needed.
-		/// </summary>
-		/// <returns domElement="true" />
-
-		// So that the element doesn't need to be recreated over and over it is stored as a property of the function.
-		// The reason it is not stored as a normal variable is so that if it is never needed it is never created.
-		getTestElement.element = getTestElement.element || document.createElement("div");
-		return getTestElement.element;
-	}
-
 	//#region Options
 
 	var options =
@@ -191,7 +178,7 @@ window.perfshim = function ()
 			},
 			environmentNeeds: function ()
 			{
-				return (typeof getTestElement().addEventListener !== "function");
+				return (typeof document.createElement("div").addEventListener !== "function");
 			},
 			dependencies: function (loadedShims)
 			{
