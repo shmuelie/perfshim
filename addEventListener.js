@@ -59,7 +59,7 @@ window.perfshim("addEventListener", function ()
             {
                 newEvent.isImmediatePropagationStopped = returnTrue;
                 newEvent.stopPropagation();
-            }
+            };
             newEvent.isImmediatePropagationStopped = returnFalse;
 
             // Handle mouse position
