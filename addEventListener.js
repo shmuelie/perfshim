@@ -6,6 +6,85 @@
 window.perfshim("addEventListener", function ()
 {
     "use strict";
+
+    function fixEvent(oEvent)
+    {
+        /// <summary>
+        ///     Make sure the Event object works like the official one.
+        /// </summary>
+        /// <param name="oEvent" type="Object">Suspect Event object</param>
+        /// <returns type="Object" />
+        /// <remarks>
+        ///     Based on code from "Secrets of the JavaScript Ninja", Listing 13.3
+        /// </remarks>
+
+        function returnTrue()
+        {
+            return true;
+        }
+
+        function returnFalse()
+        {
+            return false;
+        }
+
+        if (oEvent.stopPropagation === undefined)
+        {
+            // Create a clone
+            var newEvent = {};
+            for (var eventPropertyName in oEvent)
+            {
+                newEvent[eventPropertyName] = oEvent[eventPropertyName];
+            }
+
+            // The event occurred on this element.
+            if (newEvent.target === undefined)
+            {
+                newEvent.target = newEvent.srcElement || document;
+            }
+
+            // Handle which other element the event is related to
+            newEvent.relatedTarget = (newEvent.fromElement === newEvent.target ? newEvent.toElement : newEvent.fromElement);
+
+            // Stop the default browser action
+            newEvent.preventDefault = function ()
+            {
+                newEvent.returnValue = false;
+                newEvent.isDefaultPrevented = returnTrue;
+            };
+            newEvent.isDefaultPrevented = returnFalse;
+
+            // Stop the event from bubbling
+            newEvent.stopOmmediatePropagation = function ()
+            {
+                newEvent.isImmediatePropagationStopped = returnTrue;
+                newEvent.stopPropagation();
+            }
+            newEvent.isImmediatePropagationStopped = returnFalse;
+
+            // Handle mouse position
+            if ((newEvent.clientX !== null) && (newEvent.clientX !== undefined))
+            {
+                var docElmt = document.documentElement;
+                var bodyElmt = document.body;
+
+                newEvent.pageX = newEvent.clientX + ((docElmt && docElmt.scrollLeft) || (bodyElmt && bodyElmt.scrollLeft) || 0) - ((docElmt && docElmt.clientLeft) || (bodyElmt && bodyElmt.clientLeft) || 0);
+                newEvent.pageY = newEvent.clientY + ((docElmt && docElmt.scrollTop) || (bodyElmt && bodyElmt.scrollTop) || 0) - ((docElmt && docElmt.clientTop) || (bodyElmt && bodyElmt.clientTop) || 0);
+            }
+
+            // Handle Key presses
+            newEvent.which = newEvent.charCode || newEvent.keyCode;
+
+            // Fix button for mouse clicks
+            // 0 == left, 1 == middle, 2 == right
+            if ((newEvent.button !== null) && (newEvent.button !== undefined))
+            {
+                newEvent.button = (newEvent.button & 1 ? 0 : (newEvent.button & 4 ? 1 : (newEvent.button & 2 ? 2 : 0)));
+            }
+        }
+        return oEvent;
+    }
+
     if (typeof window.addEventListener !== "function")
     {
         var rootElement = Element || HTMLElement;
@@ -52,6 +131,8 @@ window.perfshim("addEventListener", function ()
                     {
                         oEvent = window.event;
                     }
+
+                    oEvent = fixEvent(oEvent);
 
                     // Execute each function that has been registered for the event.
                     var functionsLength = eventLoop.functions.length;
