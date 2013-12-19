@@ -134,7 +134,7 @@ window.perfshim = function ()
 		"Element-Prototype":
 		{
 			name: "Element-Prototype",
-			url: "Element-Prototype.js",
+			url: "Scripts\\Element-Prototype.min.js",
 			regex: /(?:\s|;|^|(?:window\.))Element\.prototype(?:(?:\.\w)|\[)/,
 			scriptNeeds: function (script)
 			{
@@ -152,7 +152,7 @@ window.perfshim = function ()
 		"HTMLElement-Prototype":
 		{
 			name: "HTMLElement-Prototype",
-			url: "HTMLElement-Prototype.js",
+			url: "Scripts\\HTMLElement-Prototype.min.js",
 			regex: /(?:\s|;|^|(?:window\.))HTMLElement\.prototype(?:(?:\.\w)|\[)/,
 			scriptNeeds: function (script)
 			{
@@ -170,7 +170,7 @@ window.perfshim = function ()
 		addEventListener:
 		{
 			name: "addEventListener",
-			url: "addEventListener.js",
+			url: "Scripts\\addEventListener.min.js",
 			regex: new RegExp("(((\\w|])(\\[(\"|')addEventListener\\5\\]))|(\\w\\.addEventListener))(\\(|\\.call\\(|\\.apply\\(|\\[(\"|')call\\8\\]\\(|\\[(\"|')apply\\9\\]\\()"),
 			scriptNeeds: function (script)
 			{
@@ -192,7 +192,7 @@ window.perfshim = function ()
 		arrayIndexOf:
 		{
 			name: "arrayIndexOf",
-			url: "arrayIndexOf.js",
+			url: "Scripts\\arrayIndexOf.min.js",
 			regex: new RegExp("(((\\w|])(\\[(\"|')indexOf\\5\\]))|(\\w\\.indexOf))(\\(|\\.call\\(|\\.apply\\(|\\[(\"|')call\\8\\]\\(|\\[(\"|')apply\\9\\]\\()"),
 			scriptNeeds: function (script)
 			{
@@ -210,7 +210,7 @@ window.perfshim = function ()
 		xmlHttpRequest:
 		{
 			name: "xmlHttpRequest",
-			url: "xmlHttpRequest.js",
+			url: "Scripts\\xmlHttpRequest.min.js",
 			scriptNeeds: function (script)
 			{
 				return script.indexOf("new XMLHttpRequest()") !== -1;
@@ -227,7 +227,7 @@ window.perfshim = function ()
 		isArray:
 		{
 			name: "isArray",
-			url: "isArray.js",
+			url: "Scripts\\isArray.min.js",
 			scriptNeeds: function (script)
 			{
 				return script.indexOf("Array.isArray") !== -1;
@@ -244,7 +244,7 @@ window.perfshim = function ()
 		typeOf:
 		{
 			name: "typeOf",
-			url: "typeOf.js",
+			url: "Scripts\\typeOf.min.js",
 			scriptNeeds: function (script)
 			{
 				return script.indexOf("typeOf") !== -1;
@@ -261,7 +261,7 @@ window.perfshim = function ()
 		JSON:
 		{
 			name: "JSON",
-			url: "json2.js",
+			url: "Scripts\\json2.min.js",
 			scriptNeeds: function (script)
 			{
 				return script.indexOf("JSON.") !== -1;
@@ -278,7 +278,7 @@ window.perfshim = function ()
 		canvas:
 		{
 			name: "canvas",
-			url: "canvas.js",
+			url: "Scripts\\canvas.min.js",
 			scriptNeeds: function (script)
 			{
 				return script.indexOf("getContext") !== -1;
@@ -295,7 +295,7 @@ window.perfshim = function ()
 		createElement:
 		{
 			name: "createElement",
-			url: "createElement.js",
+			url: "Scripts\\createElement.min.js",
 			environmentNeeds: function ()
 			{
 				return true;
@@ -628,7 +628,7 @@ window.perfshim = function ()
 				switch (typeof userOptions[name])
 				{
 					case "string":
-						options.push({ url: userOptions[name], type: "normal" });
+						options[name].push({ url: userOptions[name], type: "normal" });
 						break;
 					case "object":
 						if (Array.isArray(userOptions[name]))
