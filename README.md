@@ -16,24 +16,9 @@ your page. You do not include any of the scripts from your site that you want
 to use on the page, PerfShim will download them for you. In an inline script 
 on the page you call the perfshim function. 
 
-PerfShim can be called in two ways: legacy or objective.
-
-### Legacy: 
-A simple function call that consist of one or more arguments being passed. If 
-the first argument is a function then it is the callback method. Every other 
-argument (and the first if not a function) must be a string that points to a 
-script in the same origin as the webpage to be analyzed and then executed once 
-all shims are run. This mode is here for backward compatibility with version 1.0
-	
-#### Examples:
-
-		perfshim(somefunction, "Script1.js", "Script2.js", ScriptN.js");
-		perfshim("Script1.js", "Script2.js", ScriptN.js");
-
-### Objective: 
-A function call where the only parameter should be an object formatted based on 
-the formatting bellow. It will be merged with the base options as well as 
-normalized for the following "ease of use" rules:
+The only parameter is an object formatted based on the formatting bellow. It 
+will be merged with the base options as well as normalized for the following 
+"ease of use" rules:
 
 1. Any options that take an array may have their value set to the only value 
    directly.

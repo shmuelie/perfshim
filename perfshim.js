@@ -21,24 +21,9 @@
 	to use on the page, PerfShim will download them for you. In an inline script
 	on the page you call the perfshim function.
 
-	PerfShim can be called in two ways: legacy or objective.
-
-	### Legacy:
-	A simple function call that consist of one or more arguments being passed. If
-	the first argument is a function then it is the callback method. Every other
-	argument (and the first if not a function) must be a string that points to a
-	script in the same origin as the webpage to be analyzed and then executed once
-	all shims are run. This mode is here for backward compatibility with version 1.0
-	
-	#### Examples:
-
-		perfshim(somefunction, "Script1.js", "Script2.js", ScriptN.js");
-		perfshim("Script1.js", "Script2.js", ScriptN.js");
-
-	### Objective:
-	A function call where the only parameter should be an object formatted based on
-	the formatting bellow. It will be merged with the base options as well as
-	normalized for the following "ease of use" rules:
+	The only parameter is an object formatted based on the formatting bellow. It 
+	will be merged with the base options as well as normalized for the 
+	following "ease of use" rules:
 
 	1. Any options that take an array may have their value set to the only value directly.
 	2. executeScripts and noExecuteScripts can be set set as string(s) instead of objects if the script is not cross domain.
@@ -848,50 +833,24 @@ window.perfshim = function ()
 
 	(function ()
 	{
-		if (callArguemets.length === 0)
+	    if (callArguemets.length !== 1) // One argument is required.
 		{
-			// No matter what mode at least one argument is required.
-			throw new Error("PerfShim requires at least one argument.");
+			throw new Error("PerfShim requires one argument.");
 		}
 
-		// To decide which mode to is be required we check the number of arguments and the types.
-		if ((callArguemets.length === 1) && (typeof callArguemets[0] === "object")) // If there is only one argument and it is an object, Objective mode.
+		if (typeof callArguemets[0] !== "object") // That argument must be an object
 		{
-			var userOptions = callArguemets[0];
-
-			if ((userOptions.analyze !== undefined) && (userOptions.analyze !== null) && (typeof userOptions.analyze === "boolean"))
-			{
-				options.analyze = userOptions.analyze;
-			}
-
-			// To do more validation Objective mode requires some shims.
-			checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "isArray", "typeOf"], secondValidation);
+		    throw new Error("Argument must be an object.");
 		}
-		else // Otherwise legacy mode.
+
+		var userOptions = callArguemets[0];
+
+		if ((userOptions.analyze !== undefined) && (userOptions.analyze !== null) && (typeof userOptions.analyze === "boolean"))
 		{
-			var agumentIndexStart = 0;
-
-			// If the first argument is a function, store it as the callback.
-			if (typeof callArguemets[0] === "function")
-			{
-				options.callbacks.push(callArguemets[0]);
-				agumentIndexStart = 1;
-			}
-
-			// Make sure that each script argument is a string.
-			var argumentsLength = callArguemets.length;
-			for (var argumentIndex = agumentIndexStart; argumentIndex < argumentsLength; argumentIndex++)
-			{
-				if (typeof callArguemets[argumentIndex] !== "string")
-				{
-					throw new Error("All scripts must be strings");
-				}
-			}
-
-			options.executeScripts = Array.prototype.slice.call(callArguemets, agumentIndexStart);
-
-			// All validation has been done so just make sure XMLHttpRequest is there.
-			checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "typeOf"], downloadScripts);
+			options.analyze = userOptions.analyze;
 		}
+
+		// To do more validation Objective mode requires some shims.
+		checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "isArray", "typeOf"], secondValidation);
 	})();
 };
