@@ -109,6 +109,11 @@ Note about versions: The major and minor are used for the perfshim core
 used for updates to existing shims. The three "sections" will increase 
 independently of each other.
 
+Version 3.0.4.7
+* Removed Legacy calling mode
+* Removed requirement on typeOf Shim
+* Using minified perfshim.js works now.
+
 Version 2.4.4.7
 * Added code to help standardize the event object given in addEventListner shim
 
