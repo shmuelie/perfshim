@@ -1,14 +1,15 @@
 ﻿# PerfShim
-The main problem with most shimming solutions is that you download the code for 
-the shim to to the browser, parse it, and even execute the code even though the 
-browser or page does not need the shim. This not only take longer but in an 
-increasingly mobile world the amount of data that needs to be downloaded should 
-be minimized. 
+The main problem with most shimming/pollyfilling solutions is that you download 
+the code for the shims/pollyfills to to the browser, parse them, and execute 
+the code. You do all this even though the browser or page may not need the 
+shims/pollyfills. This not only take longer but in an increasingly mobile world 
+the amount of data that needs to be downloaded should be minimized. 
 
 PerfShim (short for Performance Shim) solves these problems in an interesting 
-way. Instead of including ever shim ever created to be downloaded, PerfShim 
-analyzes your pages scripts, checks which shims are used by the scripts, check 
-if the shims are needed by the browser, and if they are needed downloads them.
+way. Instead of including every shim/pollyfill in the main download, PerfShim 
+analyzes your page's scripts, checks which shims/pollyfills are used by the 
+scripts, check if the shims are needed by the browser, and finally if they are 
+needed by both downloads them to be executed.
 
 ## How To Use PerfShim
 To use PerfShim on a page you start by including the perfshim.min.js file on 
@@ -86,20 +87,17 @@ Downloads otherdomain.com/Script.js and Script.js
 ## How it Works
 PerfShim works in a simple 7 step process:
 
-1. Detect which calling "method" was used. Then check on the parameter(s) that 
-   can be checked in all environments. 
-2. To work PerfShim requires some shims. Some are used to just check the 
-   parameters, others are used to do its job. 
-3. This step is skipped if the calling "method" was legacy. If though the 
-   calling method was "objective" then a second round of parameter verification 
-   occurs. These validations may require shims to run so could not run in the 
-   first pass.
+1. Check on the options that can be checked in all environments. 
+2. To check the remaining options as well as work PerfShim requires some 
+   shims/pollyfills. Check if the browser does not have them and if so download 
+   them.
+3. A second round of option verification occurs.
 4. Each script to be analyzed is downloaded using XMLHttpRequest if from the 
    same origin, otherwise using JSONP.
-5. Unless disabled in "objective" mode each shim is check against each script 
-   and the browser to see if it is needed. If so it is downloaded. Shims may 
+5. Unless disabled each shim/pollyfill is check against each script and the 
+   browser to see if it is needed. If so it is downloaded. Shims/Pollyfills may 
    also be forced to download using the mustShims option.
-6. Once all the requested shims have downloaded the are executed.
+6. Once all the requested shims/pollyfills have downloaded they are executed.
 7. All scripts the user specified are to be executed are run using a global 
    eval.
 

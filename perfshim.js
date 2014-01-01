@@ -1,32 +1,35 @@
 ﻿/// <reference path="types.js" />
 
 /*
-	PerfShim Core 2.4.4.6
+	PerfShim Core 3.0.4.7
 
 	# PerfShim
-	The main problem with most shimming solutions is that you download the code for
-	the shim to to the browser, parse it, and even execute the code even though the
-	browser or page does not need the shim. This not only take longer but in an
-	increasingly mobile world the amount of data that needs to be downloaded should
-	be minimized.
+	The main problem with most shimming/pollyfilling solutions is that you download 
+	the code for the shims/pollyfills to to the browser, parse them, and execute 
+	the code. You do all this even though the browser or page may not need the 
+	shims/pollyfills. This not only take longer but in an increasingly mobile world 
+	the amount of data that needs to be downloaded should be minimized. 
 
-	PerfShim (short for Performance Shim) solves these problems in an interesting
-	way. Instead of including ever shim ever created to be downloaded, PerfShim
-	analyzes your pages scripts, checks which shims are used by the scripts, check
-	if the shims are needed by the browser, and if they are needed downloads them.
+	PerfShim (short for Performance Shim) solves these problems in an interesting 
+	way. Instead of including every shim/pollyfill in the main download, PerfShim 
+	analyzes your page's scripts, checks which shims/pollyfills are used by the 
+	scripts, check if the shims are needed by the browser, and finally if they are 
+	needed by both downloads them to be executed.
 
 	## How To Use PerfShim
-	To use PerfShim on a page you start by including the perfshim.min.js file on
-	your page. You do not include any of the scripts from your site that you want
-	to use on the page, PerfShim will download them for you. In an inline script
-	on the page you call the perfshim function.
-
+	To use PerfShim on a page you start by including the perfshim.min.js file on 
+	your page. You do not include any of the scripts from your site that you want 
+	to use on the page, PerfShim will download them for you. In an inline script 
+	on the page you call the perfshim function. 
+	
 	The only parameter is an object formatted based on the formatting bellow. It 
-	will be merged with the base options as well as normalized for the 
-	following "ease of use" rules:
-
-	1. Any options that take an array may have their value set to the only value directly.
-	2. executeScripts and noExecuteScripts can be set set as string(s) instead of objects if the script is not cross domain.
+	will be merged with the base options as well as normalized for the following 
+	"ease of use" rules:
+	
+	1. Any options that take an array may have their value set to the only value 
+	   directly.
+	2. executeScripts and noExecuteScripts can be set set as string(s) instead of 
+	   objects if the script is not cross domain.
 
 	#### Examples
 	Downloads Script1.js and Script2.js form the same domain, analyzes them and
