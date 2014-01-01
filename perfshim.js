@@ -236,7 +236,7 @@ window.perfshim = function ()
 			},
 			environmentNeeds: function ()
 			{
-				return true;
+				return window.typeOf === undefined;
 			},
 			dependencies: function ()
 			{
@@ -657,6 +657,8 @@ window.perfshim = function ()
 			///     If the object was processed successfully.
 			/// </returns>
 
+			
+
 			if ((object.url === undefined) || (object.url === null) || (typeof object.url !== "string") ||
 				(object.type === undefined) || (object.type === null) || (typeof object.type !== "string"))
 			{
@@ -672,6 +674,41 @@ window.perfshim = function ()
 					});
 					return true;
 				case "json":
+
+					// For this logic we need the typeOf Shim. Therefore it is included here. The Shim still exists as a "downloadable" for cases when the user wants it but this was never run.
+					if (window.typeOf === undefined)
+					{
+						window.typeOf = function (object, nullAsObject)
+						{
+							/// <summary>
+							///     Returns the type of object.
+							/// </summary>
+							/// <param name="object">
+							///     The object to test.
+							/// </param>
+							/// <param name="nullAsObject" optional="true" type="Boolean">
+							///     If true null returns 'object' (the default behavior of typeof). If false returns 'null'.
+							/// </param>
+							/// <returns type="String">
+							///     The type string. For native types the return type is identical to typeof (by default).
+							/// </returns>
+
+							nullAsObject = nullAsObject || true;
+
+							var normalTypeOf = typeof object;
+
+							if (normalTypeOf !== "object")
+							{
+								return normalTypeOf;
+							}
+							if (nullAsObject && (object === null))
+							{
+								return "object";
+							}
+							return Object.prototype.toString.call(object).slice(8, -1).toLowerCase();
+						};
+					}
+
 					if ((object.method === undefined) || (object.method === null) || !((typeof object.method === "string") || (window.typeOf(object.method) === "regex")))
 					{
 						return false;
@@ -833,14 +870,14 @@ window.perfshim = function ()
 
 	(function ()
 	{
-	    if (callArguemets.length !== 1) // One argument is required.
+		if (callArguemets.length !== 1) // One argument is required.
 		{
 			throw new Error("PerfShim requires one argument.");
 		}
 
 		if (typeof callArguemets[0] !== "object") // That argument must be an object
 		{
-		    throw new Error("Argument must be an object.");
+			throw new Error("Argument must be an object.");
 		}
 
 		var userOptions = callArguemets[0];
@@ -851,6 +888,6 @@ window.perfshim = function ()
 		}
 
 		// To do more validation Objective mode requires some shims.
-		checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "isArray", "typeOf"], secondValidation);
+		checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "isArray"], secondValidation);
 	})();
 };
