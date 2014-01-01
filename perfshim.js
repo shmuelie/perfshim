@@ -657,8 +657,6 @@ window.perfshim = function ()
 			///     If the object was processed successfully.
 			/// </returns>
 
-			
-
 			if ((object.url === undefined) || (object.url === null) || (typeof object.url !== "string") ||
 				(object.type === undefined) || (object.type === null) || (typeof object.type !== "string"))
 			{
