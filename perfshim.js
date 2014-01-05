@@ -43,8 +43,14 @@
 		pershim({executeScripts: "Script.js"});
 */
 
-window.perfshim = function ()
+window.perfshim = function (userOptions)
 {
+	/// <summary>
+	///     Start PerfShim logic.
+	/// </summary>
+	/// <param name="userOptions" type="Object">
+	///     Options.
+	/// </param>
 	"use strict";
 	var globalEval = window.execScript || eval; // Makes "eval" work in global scope. Used to execute user given scripts once browser is "patched".
 
@@ -310,9 +316,9 @@ window.perfshim = function ()
 		/// </summary>
 		/// <param name="url" type="String">
 		///     The URL of the script.
-	    /// </param>
+		/// </param>
 
-	    loadScriptViaTag.firstScriptElement = loadScriptViaTag.firstScriptElement || document.getElementsByTagName("script")[0];
+		loadScriptViaTag.firstScriptElement = loadScriptViaTag.firstScriptElement || document.getElementsByTagName("script")[0];
 
 		var scriptElement = document.createElement("script");
 		scriptElement.src = url;
@@ -435,7 +441,7 @@ window.perfshim = function ()
 			{
 				if (options.attachScripts)
 				{
-				    loadScriptViaTag(options.executeScripts[scriptsIndex]);
+					loadScriptViaTag(options.executeScripts[scriptsIndex]);
 				}
 				else
 				{
@@ -582,7 +588,7 @@ window.perfshim = function ()
 				}
 				else
 				{
-				    loadScriptViaTag(script.url);
+					loadScriptViaTag(script.url);
 
 					window.perfshim = function (data)
 					{
@@ -620,15 +626,11 @@ window.perfshim = function ()
 		}
 	}
 
-	var callArguemets = Array.prototype.slice.call(arguments, 0);
-
 	function secondValidation()
 	{
 		/// <summary>
 		///     Objective mode requires some shims for it to finish validation.
 		/// </summary>
-
-		var userOptions = callArguemets[0];
 
 		function testScriptCollection(name)
 		{
@@ -897,26 +899,21 @@ window.perfshim = function ()
 		}
 	}
 
-	(function ()
+	if (arguments.length !== 1) // One argument is required.
 	{
-		if (callArguemets.length !== 1) // One argument is required.
-		{
-			throw new Error("PerfShim requires one argument.");
-		}
+		throw new Error("PerfShim requires one argument.");
+	}
 
-		if (typeof callArguemets[0] !== "object") // That argument must be an object
-		{
-			throw new Error("Argument must be an object.");
-		}
+	if (typeof arguments[0] !== "object") // That argument must be an object
+	{
+		throw new Error("Argument must be an object.");
+	}
 
-		var userOptions = callArguemets[0];
+	if ((userOptions.analyze !== undefined) && (userOptions.analyze !== null) && (typeof userOptions.analyze === "boolean"))
+	{
+		options.analyze = userOptions.analyze;
+	}
 
-		if ((userOptions.analyze !== undefined) && (userOptions.analyze !== null) && (typeof userOptions.analyze === "boolean"))
-		{
-			options.analyze = userOptions.analyze;
-		}
-
-		// To do more validation Objective mode requires some shims.
-		checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "isArray"], secondValidation);
-	})();
+	// To do more validation Objective mode requires some shims.
+	checkRequiredShims(["xmlHttpRequest", "arrayIndexOf", "isArray"], secondValidation);
 };
