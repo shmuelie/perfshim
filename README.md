@@ -66,7 +66,13 @@ will be merged with the base options as well as normalized for the following
 			even if a script requires it. NOTE: If a shim is in both 
 			mustShims and neverShims it will be included.
 		*/
-		neverShims: []
+		neverShims: [],
+			/*
+				If true then scripts listed in either executeScripts or
+				noExecuteScripts are added to the page via script tags instead 
+				of using the global eval.
+			*/
+		attachScripts: false
 	}
 
 #### Examples
@@ -83,6 +89,29 @@ is normally an array)
 Downloads otherdomain.com/Script.js and Script.js
 
 	perfshim({executeScripts: ["Script.js", {url:"otherdomain.com/Script.js", type: "json", method: "callback"}]);
+
+#### attachScripts Warnings
+The attachScripts option was added to fix three issues with using eval to 
+execute the scripts:
+1. eval is considered evil and should never be used. In fear that it could be 
+   removed this slight future proofs PerfShim.
+2. Debugging the scripts is a pain because they are not in their file but in an 
+   eval script.
+3. Code that is "eval"ed may not be optimized the same as code as "normal" 
+   code. This can make code that PerfShim evals run slower.
+
+On the flip side though there are two downsides to not "eval"ing the code that 
+PerfShim downloads:
+1. Depending on how the browser caches the JavaScript file it may redownload 
+   the script. This defeats one of PerfShim's goals of minimizing bytes 
+   downloaded.
+2. There is the chance that the file that PerfShim downloads to scan and the 
+   file the browser downloads to execute may be different. If the difference 
+   requires a shim/pollyfill the PerfShim did not "patch" then the script could 
+   break.
+
+Primarily because of the second downside PerfShim defaults to using eval still.
+
 
 ## How it Works
 PerfShim works in a simple 7 step process:

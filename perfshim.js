@@ -48,16 +48,12 @@ window.perfshim = function ()
 	"use strict";
 	var globalEval = window.execScript || eval; // Makes "eval" work in global scope. Used to execute user given scripts once browser is "patched".
 
-	function getFirstScriptElement()
-	{
-		/// <summary>
-		///     Gets the first script element in the page.
-		/// </summary>
-		/// <returns domElement="true" />
-
-		getFirstScriptElement.element = getFirstScriptElement.element || document.getElementsByTagName("script")[0];
-		return getFirstScriptElement.element;
-	}
+	// Stores the actual script to be analyzed.
+	var scripts =
+		{
+			executeScripts: [],
+			noExecuteScripts: []
+		};
 
 	//#region Options
 
@@ -101,7 +97,13 @@ window.perfshim = function ()
 				even if a script requires it. NOTE: If a shim is in both
 				mustShims and neverShims it will be included.
 			*/
-			neverShims: []
+			neverShims: [],
+			/*
+				If true then scripts listed in either executeScripts or
+				noExecuteScripts are added to the page via script tags instead 
+				of using the global eval.
+			*/
+			attachScripts: false
 		};
 
 	//#endregion
@@ -301,6 +303,23 @@ window.perfshim = function ()
 
 	//#endregion
 
+	function loadScriptViaTag(url)
+	{
+		/// <summary>
+		///     Adds a script tag to the page to load a JavaScriptFile.
+		/// </summary>
+		/// <param name="url" type="String">
+		///     The URL of the script.
+	    /// </param>
+
+	    loadScriptViaTag.firstScriptElement = loadScriptViaTag.firstScriptElement || document.getElementsByTagName("script")[0];
+
+		var scriptElement = document.createElement("script");
+		scriptElement.src = url;
+		scriptElement.type = "text/javascript";
+		loadScriptViaTag.firstScriptElement.parentNode.insertBefore(scriptElement, loadScriptViaTag.firstScriptElement);
+	}
+
 	function loadShim(shim, loadedShims)
 	{
 		/// <summary>
@@ -333,10 +352,7 @@ window.perfshim = function ()
 			loadedShims[shim.name] = false;
 
 			// Download the shim
-			var scriptElement = document.createElement("script");
-			scriptElement.src = shim.url;
-			scriptElement.type = "text/javascript";
-			getFirstScriptElement().parentNode.insertBefore(scriptElement, getFirstScriptElement());
+			loadScriptViaTag(shim.url);
 		}
 	}
 
@@ -417,7 +433,14 @@ window.perfshim = function ()
 			var scriptsLength = options.executeScripts.length;
 			for (var scriptsIndex = 0; scriptsIndex < scriptsLength; scriptsIndex++)
 			{
-				globalEval(options.executeScripts[scriptsIndex]);
+				if (options.attachScripts)
+				{
+				    loadScriptViaTag(options.executeScripts[scriptsIndex]);
+				}
+				else
+				{
+					globalEval(scripts.executeScripts[scriptsIndex]);
+				}
 			}
 
 			var callbacksLength = options.callbacks.length;
@@ -459,7 +482,7 @@ window.perfshim = function ()
 			if (shims.hasOwnProperty(shimName))
 			{
 				var shim = shims[shimName];
-				if (shim.environmentNeeds() && ((options.mustShims.indexOf(shimName) !== -1) || ((options.neverShims.indexOf(shimName) === -1) && options.analyze && (checkIfScriptCollectionNeedsShim(shim, options.executeScripts) && checkIfScriptCollectionNeedsShim(shim, options.noExecuteScripts)))))
+				if (shim.environmentNeeds() && ((options.mustShims.indexOf(shimName) !== -1) || ((options.neverShims.indexOf(shimName) === -1) && options.analyze && (checkIfScriptCollectionNeedsShim(shim, scripts.executeScripts) && checkIfScriptCollectionNeedsShim(shim, scripts.noExecuteScripts)))))
 				{
 					loadShim(shim, loadedShims);
 				}
@@ -481,19 +504,27 @@ window.perfshim = function ()
 			///     Checks if all the scripts have downloaded.
 			/// </summary>
 
-			var executeScriptsLength = options.executeScripts.length;
+			var executeScriptsLength = scripts.executeScripts.length;
+			if (executeScriptsLength !== options.executeScripts.length)
+			{
+				return;
+			}
 			for (var executeScriptsIndex = 0; executeScriptsIndex < executeScriptsLength; executeScriptsIndex++)
 			{
-				if (typeof options.executeScripts[executeScriptsIndex] !== "string")
+				if (typeof scripts.executeScripts[executeScriptsIndex] !== "string")
 				{
 					return;
 				}
 			}
 
-			var noExecuteScriptLength = options.noExecuteScripts.length;
+			var noExecuteScriptLength = scripts.noExecuteScripts.length;
+			if (noExecuteScriptLength !== options.noExecuteScripts.length)
+			{
+				return;
+			}
 			for (var noExecuteScriptsIndex = 0; noExecuteScriptsIndex < noExecuteScriptLength; noExecuteScriptsIndex++)
 			{
-				if (typeof options.noExecuteScripts[noExecuteScriptsIndex] !== "string")
+				if (typeof scripts.noExecuteScripts[noExecuteScriptsIndex] !== "string")
 				{
 					return;
 				}
@@ -542,7 +573,7 @@ window.perfshim = function ()
 								throw new Error("PerfShim was given a 'script' that is not a script");
 							}
 
-							options[name][scriptIndex] = this.responseText;
+							scripts[name][scriptIndex] = this.responseText;
 
 							checkIfAllScriptsDownloaded();
 						}
@@ -551,10 +582,7 @@ window.perfshim = function ()
 				}
 				else
 				{
-					var scriptElement = document.createElement("script");
-					scriptElement.src = script.url;
-					scriptElement.type = "text/javascript";
-					getFirstScriptElement().parentNode.insertBefore(scriptElement, getFirstScriptElement());
+				    loadScriptViaTag(script.url);
 
 					window.perfshim = function (data)
 					{
@@ -565,7 +593,7 @@ window.perfshim = function ()
 						///     The JSONP script (in some form).
 						/// </param>
 
-						options[name][scriptIndex] = data.toString();
+						scripts[name][scriptIndex] = data.toString();
 
 						checkIfAllScriptsDownloaded();
 					};
