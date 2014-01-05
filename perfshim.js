@@ -48,7 +48,7 @@ window.perfshim = function (userOptions)
 	/// <summary>
 	///     Start PerfShim logic.
 	/// </summary>
-	/// <param name="userOptions" type="Object">
+	/// <param name="userOptions" type="Options">
 	///     Options.
 	/// </param>
 	"use strict";

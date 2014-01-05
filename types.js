@@ -84,3 +84,44 @@ function ScriptObject()
 	this.type = "normal";
 	this.method = "";
 }
+
+function Options()
+{
+	/// <summary>
+	///     Options for PerfShim.
+	/// </summary>
+	/// <field name="callbacks" type="Array">
+	///     An array of either strings or function objects. If a string the string should be the name of a function that will be in the global namespace once all shims and user scripts have been executed.
+	/// </field>
+	/// <field name="executeScripts type="Array">
+	///     An array of objects that should be executed once all shims have been run. The object should be formed as:
+	///     &10;{
+	///     &10;    url: "", // The url to be called, does not need to be in the same origin.
+	///     &10;    type: "normal" | "json" // The type of script that the URL points to. If 'normal', the script is in the same origin and should be download normally. If 'json' then the code is downloaded using JSONP. What ever is returned will have ToString() called and will be executed as a string once ready.
+	///     &10;    method: "" | /regex/ // The regular expression or string to use in String.replace(String, String) on the URL to replace with the name of the callback method. If type is 'normal' may be excluded.
+	///     &10;}
+	/// </field>
+	/// <field name="noExecuteScripts" type="Array">
+	///     Same as executeScripts but scripts are only analyzed for shims. Will not be executed after shims have run.
+	/// </field>
+	/// <field name="analyze" type="Boolean">
+	///     If false scripts will not be analyzed for what shims they need. Shims will only be included if in mustShims.
+	/// </field>
+	/// </field name="mustShims" type="Array" elementType="String">
+	///     An array of string, listing the shims that should be loaded whether need by any script or not.
+	/// </field>
+	/// <field name="neverShims" type="Array" elementType="String">
+	///     An array of string, listing shims that should not be loaded even if a script requires it. NOTE: If a shim is in both mustShims and neverShims it will be included.
+	/// </field>
+	/// <field name="attachScripts" type="Boolean">
+	///     If true then scripts listed in either executeScripts or noExecuteScripts are added to the page via script tags instead of using the global eval.
+	/// </field>
+
+	this.callbacks = [];
+	this.executeScripts = [];
+	this.noExecuteScripts = [];
+	this.analyze = true;
+	this.mustShims = [];
+	this.neverShims = [];
+	this.attachScripts = false;
+}
