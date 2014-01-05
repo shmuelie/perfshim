@@ -463,6 +463,12 @@ window.perfshim = function (userOptions)
 						break;
 				}
 			}
+
+            // Cleanup to save some memory and not pollute the global.
+			options = null;
+			scripts = null;
+			shims = null;
+			window.perfshim = undefined;
 		}
 
 		window.perfshim = function (shimName, runFunction)
