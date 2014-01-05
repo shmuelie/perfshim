@@ -464,7 +464,7 @@ window.perfshim = function (userOptions)
 				}
 			}
 
-            // Cleanup to save some memory and not pollute the global.
+			// Cleanup to save some memory and not pollute the global.
 			options = null;
 			scripts = null;
 			shims = null;
@@ -905,12 +905,12 @@ window.perfshim = function (userOptions)
 		}
 	}
 
-	if (arguments.length !== 1) // One argument is required.
+	if ((userOptions === undefined) || (userOptions === null))
 	{
-		throw new Error("PerfShim requires one argument.");
+		throw new Error("'userOptions' cannot be null or undefined");
 	}
 
-	if (typeof arguments[0] !== "object") // That argument must be an object
+	if (typeof userOptions !== "object")
 	{
 		throw new Error("Argument must be an object.");
 	}
