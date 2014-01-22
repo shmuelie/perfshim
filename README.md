@@ -130,6 +130,16 @@ PerfShim works in a simple 7 step process:
 7. All scripts the user specified are to be executed are run using a global 
    eval.
 
+## Shim/PolyfillCredits
+* Canvas is from http://code.google.com/p/explorercanvas/ Taken March 7, 2013
+* addEventListener contains code based on both John Resig's JavaScript Nija and
+  MDN's sample code of how to create an addEventListener Pollyfill from
+  https://developer.mozilla.org/en-US/docs/Web/API/EventTarget.addEventListener
+* JSON from https://github.com/douglascrockford/JSON-js Taken March 7, 2013
+* XMLHttpRequest based on code from David Flanagan's JavaScript: The Definitive
+  Guide, 6th Edition.
+
+
 ## History
 Note about versions: The major and minor are used for the perfshim core 
 (perfshim.js), the revision is used to signify new shims , and the build is 
