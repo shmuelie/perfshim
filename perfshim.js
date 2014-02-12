@@ -308,7 +308,7 @@ window.perfshim = function (userOptions)
 		fromCodePoint:
 		{
 			name: "fromCodePoint",
-			url: "Scripts\\fromCodePoint.js",
+			url: "Scripts\\fromCodePoint.min.js",
 			environmentNeeds: function ()
 			{
 				return String.fromCodePoint === undefined;

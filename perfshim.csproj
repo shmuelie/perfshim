@@ -98,8 +98,14 @@
     <Content Include="extendDOM.min.js.map">
       <DependentUpon>extendDOM.js</DependentUpon>
     </Content>
+    <Content Include="fromCodePoint.min.js.map">
+      <DependentUpon>fromCodePoint.min.js</DependentUpon>
+    </Content>
     <None Include="HTMLElement-Prototype.js" />
     <Content Include="fromCodePoint.js" />
+    <Content Include="fromCodePoint.min.js">
+      <DependentUpon>fromCodePoint.js</DependentUpon>
+    </Content>
     <Content Include="HTMLElement-Prototype.min.js">
       <DependentUpon>HTMLElement-Prototype.js</DependentUpon>
     </Content>
