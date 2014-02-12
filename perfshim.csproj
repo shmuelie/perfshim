@@ -138,7 +138,7 @@
     </Content>
     <Content Include="TODO.txt" />
     <Content Include="perfshim.min.js.map">
-      <DependentUpon>perfshim.js</DependentUpon>
+      <DependentUpon>perfshim.min.js</DependentUpon>
     </Content>
     <None Include="typeOf.js" />
     <Content Include="typeOf.min.js">

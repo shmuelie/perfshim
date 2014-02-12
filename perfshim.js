@@ -304,6 +304,23 @@ window.perfshim = function (userOptions)
 			{
 				return [];
 			}
+		},
+		fromCodePoint:
+		{
+			name: "fromCodePoint",
+			url: "Scripts\\fromCodePoint.js",
+			environmentNeeds: function ()
+			{
+				return String.fromCodePoint === undefined;
+			},
+			scriptNeeds: function (script)
+			{
+				script.indexOf("String.fromCodePoint") !== -1;
+			},
+			dependencies: function ()
+			{
+				return [];
+			}
 		}
 	};
 
