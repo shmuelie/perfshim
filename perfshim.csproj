@@ -99,6 +99,7 @@
       <DependentUpon>extendDOM.js</DependentUpon>
     </Content>
     <None Include="HTMLElement-Prototype.js" />
+    <Content Include="fromCodePoint.js" />
     <Content Include="HTMLElement-Prototype.min.js">
       <DependentUpon>HTMLElement-Prototype.js</DependentUpon>
     </Content>
