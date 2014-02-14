@@ -315,7 +315,7 @@ window.perfshim = function (userOptions)
 			},
 			scriptNeeds: function (script)
 			{
-				script.indexOf("String.fromCodePoint") !== -1;
+				return script.indexOf("String.fromCodePoint") !== -1;
 			},
 			dependencies: function ()
 			{
