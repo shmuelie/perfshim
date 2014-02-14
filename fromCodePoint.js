@@ -6,23 +6,9 @@ window.perfshim("fromCodePoint", function ()
 {
     "use strict";
 
-    var defineProperty = (function ()
-    {
-        // IE 8 only supports `Object.defineProperty` on DOM elements
-        try
-        {
-            var object = {};
-            var $defineProperty = Object.defineProperty;
-            var result = $defineProperty(object, object, object) && $defineProperty;
-        }
-        catch (error)
-        {
-        }
-        return result;
-    }());
     var stringFromCharCode = String.fromCharCode;
     var floor = Math.floor;
-    var fromCodePoint = function ()
+    String.fromCodePoint = function ()
     {
         var MAX_SIZE = 0x4000;
         var codeUnits = [];
@@ -67,16 +53,4 @@ window.perfshim("fromCodePoint", function ()
         }
         return result;
     };
-    if (defineProperty)
-    {
-        defineProperty(String, 'fromCodePoint', {
-            'value': fromCodePoint,
-            'configurable': true,
-            'writable': true
-        });
-    }
-    else
-    {
-        String.fromCodePoint = fromCodePoint;
-    }
 });
