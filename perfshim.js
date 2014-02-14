@@ -321,7 +321,24 @@ window.perfshim = function (userOptions)
 			{
 				return [];
 			}
-		}
+		},
+		codePointAt:
+        {
+            name: "codePointAt",
+            url: "Scripts\\codePointAt.min.js",
+            environmentNeeds: function ()
+            {
+                return String.prototype.codePointAt === undefined;
+            },
+            scriptNeeds: function (script)
+            {
+                return script.indexOf("codePointAt") !== -1;
+            },
+            dependencies: function ()
+            {
+                return [];
+            }
+        }
 	};
 
 	//#endregion
