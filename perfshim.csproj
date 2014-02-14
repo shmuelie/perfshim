@@ -77,7 +77,14 @@
     <Content Include="canvas.min.js.map">
       <DependentUpon>canvas.js</DependentUpon>
     </Content>
+    <Content Include="codePointAt.min.js.map">
+      <DependentUpon>codePointAt.min.js</DependentUpon>
+    </Content>
     <None Include="createElement.js" />
+    <Content Include="codePointAt.js" />
+    <Content Include="codePointAt.min.js">
+      <DependentUpon>codePointAt.js</DependentUpon>
+    </Content>
     <Content Include="createElement.min.js">
       <DependentUpon>createElement.js</DependentUpon>
     </Content>
