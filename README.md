@@ -1,13 +1,13 @@
 ﻿# PerfShim
-The main problem with most shimming/pollyfilling solutions is that you download 
-the code for the shims/pollyfills to to the browser, parse them, and execute 
+The main problem with most shimming/polyfilling solutions is that you download 
+the code for the shims/polyfills to to the browser, parse them, and execute 
 the code. You do all this even though the browser or page may not need the 
-shims/pollyfills. This not only take longer but in an increasingly mobile world 
+shims/polyfills. This not only take longer but in an increasingly mobile world 
 the amount of data that needs to be downloaded should be minimized. 
 
 PerfShim (short for Performance Shim) solves these problems in an interesting 
-way. Instead of including every shim/pollyfill in the main download, PerfShim 
-analyzes your page's scripts, checks which shims/pollyfills are used by the 
+way. Instead of including every shim/polyfill in the main download, PerfShim 
+analyzes your page's scripts, checks which shims/polyfills are used by the 
 scripts, check if the shims are needed by the browser, and finally if they are 
 needed by both downloads them to be executed.
 
@@ -107,7 +107,7 @@ PerfShim downloads:
    downloaded.
 2. There is the chance that the file that PerfShim downloads to scan and the 
    file the browser downloads to execute may be different. If the difference 
-   requires a shim/pollyfill the PerfShim did not "patch" then the script could 
+   requires a shim/polyfill the PerfShim did not "patch" then the script could 
    break.
 
 Primarily because of the second downside PerfShim defaults to using eval still.
@@ -118,22 +118,22 @@ PerfShim works in a simple 7 step process:
 
 1. Check on the options that can be checked in all environments. 
 2. To check the remaining options as well as work PerfShim requires some 
-   shims/pollyfills. Check if the browser does not have them and if so download 
+   shims/polyfills. Check if the browser does not have them and if so download 
    them.
 3. A second round of option verification occurs.
 4. Each script to be analyzed is downloaded using XMLHttpRequest if from the 
    same origin, otherwise using JSONP.
-5. Unless disabled each shim/pollyfill is check against each script and the 
-   browser to see if it is needed. If so it is downloaded. Shims/Pollyfills may 
+5. Unless disabled each shim/polyfill is check against each script and the 
+   browser to see if it is needed. If so it is downloaded. Shims/Polyfills may 
    also be forced to download using the mustShims option.
-6. Once all the requested shims/pollyfills have downloaded they are executed.
+6. Once all the requested shims/polyfills have downloaded they are executed.
 7. All scripts the user specified are to be executed are run using a global 
    eval.
 
 ## Shim/PolyfillCredits
 * Canvas is from http://code.google.com/p/explorercanvas/ Taken March 7, 2013
 * addEventListener contains code based on both John Resig's JavaScript Nija and
-  MDN's sample code of how to create an addEventListener Pollyfill from
+  MDN's sample code of how to create an addEventListener Polyfill from
   https://developer.mozilla.org/en-US/docs/Web/API/EventTarget.addEventListener
 * JSON from https://github.com/douglascrockford/JSON-js Taken March 7, 2013
 * XMLHttpRequest based on code from David Flanagan's JavaScript: The Definitive
@@ -152,7 +152,7 @@ Version 3.0.4.7
 * Using minified perfshim.js works now.
 
 Version 2.4.4.7
-* Added code to help standardize the event object given in addEventListner shim
+* Added code to help standardize the event object given in addEventListener shim
 
 Version 2.4.4.6
 * Added createElementShip back
