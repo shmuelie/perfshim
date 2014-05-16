@@ -93,8 +93,9 @@ Downloads otherdomain.com/Script.js and Script.js
 #### attachScripts Warnings
 The attachScripts option was added to fix three issues with using eval to 
 execute the scripts:
-1. eval is considered evil and should never be used. In fear that it could be 
-   removed this slight future proofs PerfShim.
+1. eval is considered evil and should never be used acording to most. In fear 
+   that it could be removed in future versions of EcmaScript/JavaScript this 
+   slightly future proofs PerfShim.
 2. Debugging the scripts is a pain because they are not in their file but in an 
    eval script.
 3. Code that is "eval"ed may not be optimized the same as code as "normal" 
@@ -111,6 +112,8 @@ PerfShim downloads:
    break.
 
 Primarily because of the second downside PerfShim defaults to using eval still.
+(Though if it can be proven that #2 isn't an issue then attachScript may become
+the default.)
 
 
 ## How it Works
@@ -128,7 +131,8 @@ PerfShim works in a simple 7 step process:
    also be forced to download using the mustShims option.
 6. Once all the requested shims/polyfills have downloaded they are executed.
 7. All scripts the user specified are to be executed are run using a global 
-   eval.
+   eval. If attachScript is true though the scripts are instead attached as
+   new script tags to the head of the page.
 
 ## Shim/PolyfillCredits
 * Canvas is from http://code.google.com/p/explorercanvas/ Taken March 7, 2013
