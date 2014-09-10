@@ -142,6 +142,8 @@ PerfShim works in a simple 7 step process:
 * JSON from https://github.com/douglascrockford/JSON-js Taken March 7, 2013
 * XMLHttpRequest based on code from David Flanagan's JavaScript: The Definitive
   Guide, 6th Edition.
+* charPointAt is from https://github.com/mathiasbynens/String.prototype.codePointAt
+  Taken Febuary 13, 2014
 
 
 ## History
