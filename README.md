@@ -144,6 +144,8 @@ PerfShim works in a simple 7 step process:
   Guide, 6th Edition.
 * charPointAt is from https://github.com/mathiasbynens/String.prototype.codePointAt
   Taken Febuary 13, 2014
+* bind is from https://github.com/Raynos/function-bind/blob/master/index.js
+  Taken September 10th, 2014
 
 
 ## History
