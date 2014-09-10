@@ -338,6 +338,23 @@ window.perfshim = function (userOptions)
             {
                 return [];
             }
+        },
+		bind:
+        {
+            name: "bind",
+            url: "Scripts\\bind.min.js",
+            evironmentNeeds: function ()
+            {
+                return Function.prototype.bind === undefined;
+            },
+            scriptNeeds: function (script)
+            {
+                return script.indexOf("bind") !== -1;
+            },
+            dependencies: function ()
+            {
+                return [];
+            }
         }
 	};
 
