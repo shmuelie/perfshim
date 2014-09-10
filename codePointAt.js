@@ -8,7 +8,7 @@ window.perfshim("codePointAt", function ()
 
     String.prototype.codePointAt = function (position)
     {
-        if (this == null)
+        if (!this)
         {
             throw TypeError();
         }
@@ -16,7 +16,7 @@ window.perfshim("codePointAt", function ()
         var size = string.length;
         // `ToInteger`
         var index = position ? Number(position) : 0;
-        if (index != index)
+        if (index !== index)
         { // better `isNaN`
             index = 0;
         }
