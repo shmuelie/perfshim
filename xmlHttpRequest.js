@@ -7,23 +7,35 @@ window.perfshim("xmlHttpRequest", function ()
     "use strict";
     if (window.XMLHttpRequest === undefined)
     {
-        window.XMLHttpRequest = function ()
+        var xhr = null;
+        try
+        {
+            // Use the latest version of the ActiveX object if available.
+            new window.ActiveXObject("Msxml2.XMLHTTP.6.0");
+            xhr = "Msxml2.XMLHTTP.6.0";
+        }
+        catch (error1)
         {
             try
             {
-                // Use the latest version of the ActiveX object if available.
-                return new window.ActiveXObject("Msxml2.XMLHTTP.6.0");
+                // Otherwise fall back on an older version.
+                new window.ActiveXObject("Msxml2.XMLHTTP.3.0");
+                xhr = "Msxml2.XMLHTTP.3.0";
             }
-            catch (error1)
+            catch (error2)
             {
-                try
-                {
-                    // Otherwise fall back on an older version.
-                    return new window.ActiveXObject("Msxml2.XMLHTTP.3.0");
-                }
-                catch (error2)
-                {
-                }
+            }
+        }
+
+        window.XMLHttpRequest = function ()
+        {
+            if (xhr)
+            {
+                return new window.ActiveXObject(xhr);
+            }
+            else
+            {
+                throw new TypeError("No XHR to create");
             }
         };
     }
