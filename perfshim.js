@@ -234,9 +234,10 @@ window.perfshim = function (userOptions)
 		{
 			name: "isArray",
 			url: "Scripts\\isArray.min.js",
+            regex: createRegexForParse("isArray"),
 			scriptNeeds: function (script)
 			{
-				return script.indexOf("Array.isArray") !== -1;
+			    return this.regex.test(script);
 			},
 			environmentNeeds: function ()
 			{
@@ -285,9 +286,10 @@ window.perfshim = function (userOptions)
 		{
 			name: "canvas",
 			url: "Scripts\\canvas.min.js",
+            regex: createRegexForParse("getContext"),
 			scriptNeeds: function (script)
 			{
-				return script.indexOf("getContext") !== -1;
+			    return this.regex.test(script);
 			},
 			environmentNeeds: function ()
 			{
@@ -319,13 +321,14 @@ window.perfshim = function (userOptions)
 		{
 			name: "fromCodePoint",
 			url: "Scripts\\fromCodePoint.min.js",
+			regex: createRegexForParse("fromCodePoint"),
 			environmentNeeds: function ()
 			{
 				return String.fromCodePoint === undefined;
 			},
 			scriptNeeds: function (script)
 			{
-				return script.indexOf("String.fromCodePoint") !== -1;
+			    return this.regex.test(script);
 			},
 			dependencies: function ()
 			{
@@ -336,13 +339,14 @@ window.perfshim = function (userOptions)
         {
             name: "codePointAt",
             url: "Scripts\\codePointAt.min.js",
+            regex: createRegexForParse("codePointAt"),
             environmentNeeds: function ()
             {
                 return String.prototype.codePointAt === undefined;
             },
             scriptNeeds: function (script)
             {
-                return script.indexOf("codePointAt") !== -1;
+                return this.regex.test(script);
             },
             dependencies: function ()
             {
@@ -353,13 +357,14 @@ window.perfshim = function (userOptions)
         {
             name: "bind",
             url: "Scripts\\bind.min.js",
+            regex: createRegexForParse("bind"),
             evironmentNeeds: function ()
             {
                 return Function.prototype.bind === undefined;
             },
             scriptNeeds: function (script)
             {
-                return script.indexOf("bind") !== -1;
+                return this.regex.test(script);
             },
             dependencies: function ()
             {
