@@ -177,7 +177,7 @@ window.perfshim = function (userOptions)
 		{
 			name: "addEventListener",
 			url: "Scripts\\addEventListener.min.js",
-			regex: /(((\w|])(\[("|')addEventListener\5\]))|(\w\.addEventListener))(\(|\.call\(|\.apply\(|\[("|')call\8\]\(|\[("|')apply\9\]\()/,
+			regex: createRegexForParse("addEventListener"),
 			scriptNeeds: function (script)
 			{
 				return this.regex.test(script);
@@ -199,7 +199,7 @@ window.perfshim = function (userOptions)
 		{
 			name: "arrayIndexOf",
 			url: "Scripts\\arrayIndexOf.min.js",
-			regex: /(((\w|])(\[("|')indexOf\5\]))|(\w\.indexOf))(\(|\.call\(|\.apply\(|\[("|')call\8\]\(|\[("|')apply\9\]\()/,
+			regex: createRegexForParse("indexOf"),
 			scriptNeeds: function (script)
 			{
 				return this.regex.test(script);
