@@ -71,6 +71,10 @@
     <Content Include="arrayIndexOf.min.js.map">
       <DependentUpon>arrayIndexOf.js</DependentUpon>
     </Content>
+    <Content Include="bind.js" />
+    <Content Include="bind.min.js">
+      <DependentUpon>bind.js</DependentUpon>
+    </Content>
     <Content Include="canvas.min.js">
       <DependentUpon>canvas.js</DependentUpon>
     </Content>
@@ -79,6 +83,9 @@
     </Content>
     <Content Include="codePointAt.min.js.map">
       <DependentUpon>codePointAt.min.js</DependentUpon>
+    </Content>
+    <Content Include="bind.min.js.map">
+      <DependentUpon>bind.min.js</DependentUpon>
     </Content>
     <None Include="createElement.js" />
     <Content Include="codePointAt.js" />
