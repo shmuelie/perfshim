@@ -114,7 +114,17 @@ window.perfshim = function (userOptions)
 
 	//#endregion
 
-	//#region Shims
+    //#region Shims
+
+	function createRegexForParse(funcName)
+	{
+	    /// <summary>
+	    ///     Creates a regular expression that looks for a function call.
+	    /// </summary>
+	    /// <param name="funcName" type="String" />
+
+	    return new RegExp("(((\\w|])(\\[(\"|')" + funcName + "\\5\\]))|(\\w\\." + funcName + "))(\\(|\\.call\\(|\\.apply\\(|\\[(\"|')call\\8\\]\\(|\\[(\"|')apply\\9\\]\\()");
+	}
 
 	// A collection of the shims. For more details about the a shim see it's code file.
 	// A shim has the following members:
