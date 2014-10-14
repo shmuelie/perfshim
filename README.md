@@ -156,6 +156,21 @@ Note about versions: The major and minor are used for the perfshim core
 used for updates to existing shims. The three "sections" will increase 
 independently of each other.
 
+Version 3.4.8.11
+* Added code to remove most of PerfShim memory usage as well as remove the perfshim function from the window.
+* Added attachScripts option
+* Fixed README wording
+* Removed getFirstScriptElement by folding it into more usefull loadScriptViaTag method
+* Removed old parameter related code from legacy mode that was not needed any more.
+* Fixed the parameter checking code to reflect what it needs better
+* Added credit for Shims and Polyfills
+* Added fromCodePoint polyfill
+* Added codePointAt polyfill
+* Change XHR shim to only try to calculate what ActiveX object to use once on 'shimming'.
+* Added function to create regular expression that looks for a function call
+* Simplified logic for detecting dependencies from addEventListener
+* Added String.trim polyfil
+
 Version 3.0.4.7
 * Removed Legacy calling mode
 * Removed requirement on typeOf Shim
