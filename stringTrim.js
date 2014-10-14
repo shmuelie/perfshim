@@ -12,6 +12,6 @@ window.perfshim("stringTrim", function ()
         String.prototype.trim = function ()
         {
             return this.replace(rtrim, "");
-        }
+        };
     }
 });
