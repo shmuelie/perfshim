@@ -146,6 +146,8 @@ PerfShim works in a simple 7 step process:
   Taken Febuary 13, 2014
 * bind is from https://github.com/Raynos/function-bind/blob/master/index.js
   Taken September 10th, 2014
+* String.trim from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim
+  Taken October 14th, 2014
 
 
 ## History

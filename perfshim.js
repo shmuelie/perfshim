@@ -370,6 +370,24 @@ window.perfshim = function (userOptions)
             {
                 return [];
             }
+        },
+		stringTrim:
+        {
+            name: "stringTrim",
+            url: "Scripts\\stringTrim.min.js",
+            regex: createRegexForParse("trim"),
+            environmentNeeds: function ()
+            {
+                return String.prototype.trim === undefined;
+            },
+            scriptNeeds: function (script)
+            {
+                return this.regex.test(script);
+            },
+            dependencies: function ()
+            {
+                return [];
+            }
         }
 	};
 
