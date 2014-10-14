@@ -156,9 +156,16 @@
     <Content Include="perfshim.min.js">
       <DependentUpon>perfshim.js</DependentUpon>
     </Content>
+    <Content Include="stringTrim.js" />
+    <Content Include="stringTrim.min.js">
+      <DependentUpon>stringTrim.js</DependentUpon>
+    </Content>
     <Content Include="TODO.txt" />
     <Content Include="perfshim.min.js.map">
       <DependentUpon>perfshim.min.js</DependentUpon>
+    </Content>
+    <Content Include="stringTrim.min.js.map">
+      <DependentUpon>stringTrim.min.js</DependentUpon>
     </Content>
     <None Include="typeOf.js" />
     <Content Include="typeOf.min.js">
