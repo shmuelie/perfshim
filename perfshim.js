@@ -188,7 +188,7 @@ window.perfshim = function (userOptions)
 			},
 			dependencies: function (loadedShims)
 			{
-				if (loadedShims.hasOwnProperty("Element-Prototype") || loadedShims.hasOwnProperty("HTMLElement-Prototype") || !shims["Element-Prototype"].environmentNeeds() || !shims["HTMLElement-Prototype"].environmentNeeds())
+				if (loadedShims.hasOwnProperty("HTMLElement-Prototype"))
 				{
 					return ["arrayIndexOf"];
 				}
