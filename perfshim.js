@@ -1,7 +1,7 @@
 ﻿/// <reference path="types.js" />
 
 /*
-	PerfShim Core 3.0.4.7
+	PerfShim Core 3.4.8.11
 
 	# PerfShim
 	The main problem with most shimming/pollyfilling solutions is that you download 
